@@ -8,9 +8,9 @@ paper/ 目录为论文
 
 编译命令（Windows）
 
-'''bash
+```bash
 xelatex.exe -synctex=1 -interaction=nonstopmode "example".tex
-'''
+```
 
 不再同步 ``example.pdf`` ，因为那玩意可以在你电脑上编译出来，同步没有意义
 
