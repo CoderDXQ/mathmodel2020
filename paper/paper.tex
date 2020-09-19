@@ -33,7 +33,7 @@
 
  %填写摘要
 \begin{abstract}
-摘要文字，请删除我巴拉巴拉
+摘要文字，唐麒淳
 
 
 问题一：唐麒淳
@@ -46,6 +46,8 @@
 
 问题五：戴维
 
+
+关键字有待补充！！！
 %填写关键字
 \keywords{分布转换\quad 基于模型的特征筛选\quad 贝叶斯优化\quad 5折交叉验证\quad TPE算法}
 \end{abstract}
@@ -71,22 +73,45 @@
 \section{问题重述}
 \FloatBarrier
 \subsection{问题背景}
-巴拉巴拉一堆话
+
+汽油是小型车辆的主要燃料，汽油燃烧产生的尾气排放对大气环境有重要影响。为此，世界各国都制定了日益严格的汽油质量标准（见下表）。汽油清洁化重点是降低汽油中的硫、烯烃含量，同时尽量保持其辛烷值。
+
+我国原油对外依存度超过70\%，且大部分是中东地区的含硫和高硫原油。原油中的重油通常占比40-60\%，这部分重油（以硫为代表的杂质含量也高）难以直接利用。为了有效利用重油资源，我国大力发展了以催化裂化为核心的重油轻质化工艺技术，将重油转化为汽油、柴油和低碳烯烃，超过70\%的汽油是由催化裂化生产得到，因此成品汽油中95\%以上的硫和烯烃来自催化裂化汽油。故必须对催化裂化汽油进行精制处理，以满足对汽油质量要求。
+
+辛烷值（以RON表示）是反映汽油燃烧性能的最重要指标，并作为汽油的商品牌号（例如89\#、92\#、95\#）。现有技术在对催化裂化汽油进行脱硫和降烯烃过程中，普遍降低了汽油辛烷值。辛烷值每降低1个单位，相当于损失约150元/吨。以一个100万吨/年催化裂化汽油精制装置为例，若能降低RON损失0.3个单位，其经济效益将达到四千五百万元。
+
+化工过程的建模一般是通过数据关联或机理建模的方法来实现的，取得了一定的成果。但是由于炼油工艺过程的复杂性以及设备的多样性，它们的操作变量（控制变量）之间具有高度非线性和相互强耦联的关系，而且传统的数据关联模型中变量相对较少、机理建模对原料的分析要求较高，对过程优化的响应不及时，所以效果并不理想。
+
+某石化企业的催化裂化汽油精制脱硫装置运行4年，积累了大量历史数据，其汽油产品辛烷值损失平均为1.37个单位，而同类装置的最小损失值只有0.6个单位。故有较大的优化空间。请参赛研究生探索利用数据挖掘技术来解决化工过程建模问题。
+
+
+
+
 \FloatBarrier
 \subsection{问题提出}
 
-\textbf{问题1：巴拉巴拉几个字}
+\textbf{问题1：数据处理}
 
-巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话
+请参考近4年的工业数据的预处理结果，依“样本确定方法”对285号和313号数据样本进行预处理并将处理后的数据分别加入到附件一中相应的样本号中。
 
 
-\textbf{问题2：}
+\textbf{问题2：寻找建模主要变量}
 
-\textbf{问题3：}
+由于催化裂化汽油精制过程是连续的，虽然操作变量每3 分钟就采样一次，但辛烷值（因变量）的测量比较麻烦，一周仅2次无法对应。但根据实际情况可以认为辛烷值的测量值是测量时刻前两小时内操作变量的综合效果，因此预处理中取操作变量两小时内的平均值与辛烷值的测量值对应。这样产生了325个样本。
+建立降低辛烷值损失模型涉及包括7个原料性质、2个待生吸附剂性质、2个再生吸附剂性质、2个产品性质等变量以及另外354个操作变量（共计367个变量），工程技术应用中经常使用先降维后建模的方法，这有利于忽略次要因素，发现并分析影响模型的主要变量与因素。因此，请你们根据提供的325个样本数据，通过降维的方法从367个操作变量中筛选出建模主要变量，使之尽可能具有代表性、独立性（为了工程应用方便，建议降维后的主要变量在30个以下），并请详细说明建模主要变量的筛选过程及其合理性。
 
-\textbf{问题4：}
+\textbf{问题3：建立辛烷值（RON）损失预测模型}
 
-\textbf{问题5：}
+采用上述样本和建模主要变量，通过数据挖掘技术建立辛烷值（RON）损失预测模型，并进行模型验证。
+
+\textbf{问题4：主要变量操作方案的优化}
+
+要求在保证产品硫含量不大于5μg/g的前提下，利用模型获得325个数据样本中，辛烷值（RON）损失降幅大于30\%的样本对应的主要变量优化后的操作条件。
+
+\textbf{问题5：模型的可视化展示}
+
+工业装置为了平稳生产，优化后的主要操作变量往往只能逐步调整到位，请你们对133号样本，以图形展示其主要操作变量优化调整过程中对应的汽油辛烷值和硫含量的变化轨迹。
+
 
 
 %第二章节
@@ -163,7 +188,7 @@
 
 TODO: 两图并列
 
-\begin{figure}
+\begin{figure}[htb]
     \centering
     \begin{minipage}[c]{0.48\textwidth}
         \centering
@@ -200,7 +225,7 @@ TODO: 两图并列
 TODO： 三图并列
 
 
-\begin{figure}
+\begin{figure}[htb]
     \centering
     \begin{minipage}[c]{0.48\textwidth}
         \centering
@@ -258,7 +283,7 @@ TODO： 三图并列
 
 通过上述公式，我们对313样本的采样数据进行了计算：
 
-\begin{table}[ht]
+\begin{table}[htb]
 	\caption{313样本超出范围程度}\label{tab:001} \centering
 	\begin{tabular}{ccc}
 	\toprule[1.5pt]
@@ -314,21 +339,21 @@ do \ not \ process, \ & if \ mean(vector)<=5
 
 根据公式（引用）中，如果某列空值元素的长度 $len(EmptyElements)$ 大于50，并且这列元素的均值 $ mean(vector)$ 大于5，说明空值较多，做空值填充的意义不大，应该将此列删除。如果某列空值元素的长度小于50，并且这列元素的均值大于5，说明空值相对较少，可以通过做空值填充保留下来。如果这列元素的均值小于等于5，说明这列元素基本为0，0可能不是这列元素的空值，所以不做处理。
 
-\begin{figure}[!htb]
+\begin{figure}[htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{strategy-1}
 	\caption{策略1}
 \end{figure}
 
 
-\begin{figure}[!htb]
+\begin{figure}[htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{strategy-2}
 	\caption{策略2}
 \end{figure}
 
 
-\begin{figure}[!htb]
+\begin{figure}[htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{strategy-3}
 	\caption{策略3}
@@ -344,13 +369,13 @@ do \ not \ process, \ & if \ mean(vector)<=5
 
 \subsubsection{通过特征筛选获取主要变量}
 
-\begin{figure}[!htb]
+\begin{figure}[htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{feature-selection-perfs}
 	\caption{特征筛选n次后剩余特征数}
 \end{figure}
 
-\begin{figure}[!htb]
+\begin{figure}[htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{feature-selection-feats}
 	\caption{特征筛选次数与$r^2$评价指标的关系}
@@ -374,7 +399,7 @@ do \ not \ process, \ & if \ mean(vector)<=5
 
 \subsubsection{主要变量数据分析}
 
-\begin{table}[!htbp]
+\begin{table}[htb]
 	\caption{主要变量的特征重要度}\label{tab:001} \centering
 	\begin{tabular}{ccccc}
 		\toprule[1.5pt]
@@ -396,19 +421,19 @@ do \ not \ process, \ & if \ mean(vector)<=5
 	\end{tabular}
 \end{table}
 
-\begin{figure}[!htb]
+\begin{figure}[htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{feat-imp}
 	\caption{主要变量的特征重要度}
 \end{figure}
 
-\begin{figure}[!htb]
+\begin{figure}[htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{pairplot}
 	\caption{相关性矩阵图}
 \end{figure}
 
-\begin{figure}[!htb]
+\begin{figure}[htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{heatmap}
 	\caption{热力图}
@@ -423,7 +448,7 @@ do \ not \ process, \ & if \ mean(vector)<=5
 
 \subsubsection{删除异常样本}
 
-\begin{figure}[htbp]
+\begin{figure}[htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{RON-loss-abnormal}
 	\caption{删除异常样本}
@@ -432,14 +457,14 @@ do \ not \ process, \ & if \ mean(vector)<=5
 
 \subsubsection{模型训练与验证}
 
-\begin{figure}[htbp]
+\begin{figure}[htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{RON-loss-cross-validation}
 	\caption{对RON-loss进行交叉验证}
 \end{figure}
 
 
-\begin{figure}[htbp]
+\begin{figure}[htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{S-cross-validation}
 	\caption{对S进行交叉验证}
@@ -477,12 +502,12 @@ do \ not \ process, \ & if \ mean(vector)<=5
 
 
 
-\section{加图的方法，记得删除}
-\begin{figure}[!htb]
-\centering
-\includegraphics[width=.7\textwidth]{f1.png}
-\caption{问题三流程图}
-\end{figure}
+% \section{加图的方法，记得删除}
+% \begin{figure}[htb]
+% \centering
+% \includegraphics[width=.7\textwidth]{f1.png}
+% \caption{问题三流程图}
+% \end{figure}
 
 
 
