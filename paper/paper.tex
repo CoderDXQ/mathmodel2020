@@ -6,6 +6,8 @@
 %\documentclass[withoutpreface,bwprint]{cumcmthesis} %去掉封面与编号页，电子版提交的时候使用。
 
 \usepackage[framemethod=TikZ]{mdframed}
+\usepackage{float}
+\usepackage{placeins}
 %\usepackage{hyperref}
 %\usepackage{tocloft}
 \title{全降低汽油精制过程中的辛烷值损失模型}
@@ -64,9 +66,12 @@
 
 
 %第一章节
+\FloatBarrier
 \section{问题重述}
+\FloatBarrier
 \subsection{问题背景}
 巴拉巴拉一堆话
+\FloatBarrier
 \subsection{问题提出}
 
 \textbf{问题1：巴拉巴拉几个字}
@@ -84,7 +89,9 @@
 
 
 %第二章节
+\FloatBarrier
 \section{模型假设}
+
 
 %有序列表 这里写论文的模型假设
 %左侧缩进可能还需要调整
@@ -95,9 +102,11 @@
 
 
 %第三章节
+\FloatBarrier
 \section{符号说明}
 
-\begin{table}[htb]
+
+\begin{table}[hp]
     \centering
     \caption{论文中用到的符号定义}
 	\begin{tabular}{cc}
@@ -134,7 +143,9 @@
 
 
 %第四章节
+\FloatBarrier
 \section{问题分析与求解}
+\FloatBarrier
 \subsection{问题一：数据处理}
 \subsubsection{问题分析}
 
@@ -152,14 +163,14 @@
 TODO: 两图并列
 
 
-\begin{figure}[ht]
+\begin{figure}[!htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{313-fill-1}
 	\caption{S-ZORB.FT\_1204.PV}
 \end{figure}
 
 
-\begin{figure}[ht]
+\begin{figure}[!htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{313-fill-2}
 	\caption{D-121含硫污水排量}
@@ -172,21 +183,21 @@ TODO: 两图并列
 TODO： 三图并列
 
 
-\begin{figure}[]
+\begin{figure}[!htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{313-del-1}
 	\caption{D-106热氮气流量}
 \end{figure}
 
 
-\begin{figure}[ht]
+\begin{figure}[!htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{313-del-2}
 	\caption{S-ZORB.FT\_2431.DACA}
 \end{figure}
 
 
-\begin{figure}[ht]
+\begin{figure}[!htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{313-del-3}
 	\caption{3.0步骤FIC2432.SP}
@@ -265,26 +276,27 @@ do \ not \ process, \ & if \ mean(vector)<=5
 
 根据公式（引用）中，如果某列空值元素的长度 $len(EmptyElements)$ 大于50，并且这列元素的均值 $ mean(vector)$ 大于5，说明空值较多，做空值填充的意义不大，应该将此列删除。如果某列空值元素的长度小于50，并且这列元素的均值大于5，说明空值相对较少，可以通过做空值填充保留下来。如果这列元素的均值小于等于5，说明这列元素基本为0，0可能不是这列元素的空值，所以不做处理。
 
-\begin{figure}[ht]
+\begin{figure}[!htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{strategy-1}
 	\caption{策略1}
 \end{figure}
 
 
-\begin{figure}[ht]
+\begin{figure}[!htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{strategy-2}
 	\caption{策略2}
 \end{figure}
 
 
-\begin{figure}[ht]
+\begin{figure}[!htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{strategy-3}
 	\caption{策略3}
 \end{figure}
 
+\FloatBarrier
 \subsection{问题二：寻找建模主要变量}
 \subsubsection{问题分析}
 
@@ -294,13 +306,13 @@ do \ not \ process, \ & if \ mean(vector)<=5
 
 \subsubsection{通过特征筛选获取主要变量}
 
-\begin{figure}[htbp]
+\begin{figure}[!htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{feature-selection-perfs}
 	\caption{特征筛选n次后剩余特征数}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[!htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{feature-selection-feats}
 	\caption{特征筛选次数与$r^2$评价指标的关系}
@@ -346,24 +358,26 @@ do \ not \ process, \ & if \ mean(vector)<=5
 	\end{tabular}
 \end{table}
 
-\begin{figure}[htbp]
+\begin{figure}[!htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{feat-imp}
 	\caption{主要变量的特征重要度}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[!htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{pairplot}
 	\caption{相关性矩阵图}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[!htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{heatmap}
 	\caption{热力图}
 \end{figure}
 
+
+\FloatBarrier
 \subsection{问题三：建立辛烷值（RON）损失预测模型}
 \subsubsection{问题分析}
 
@@ -407,14 +421,16 @@ do \ not \ process, \ & if \ mean(vector)<=5
 
 %第五章节
 %下面这块看看怎么改
+\FloatBarrier
 \section{模型评价}
 
 
+\FloatBarrier
 \subsection{模型的优点}
 巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话
 
 
-
+\FloatBarrier
 \subsection{模型的缺点}
 巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话
 
@@ -424,7 +440,7 @@ do \ not \ process, \ & if \ mean(vector)<=5
 
 
 \section{加图的方法，记得删除}
-\begin{figure}[!h]
+\begin{figure}[!htb]
 \centering
 \includegraphics[width=.7\textwidth]{f1.png}
 \caption{问题三流程图}
