@@ -367,26 +367,43 @@ do \ not \ process, \ & if \ mean(vector)<=5
 \subsection{问题三：建立辛烷值（RON）损失预测模型}
 \subsubsection{问题分析}
 
-巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话
+采用上述样本和建模主要变量，通过数据挖掘技术建立辛烷值（RON）损失预测模型，并进行模型验证。 
 
-\subsubsection{场景建模或者其他}
+\subsubsection{删除异常样本}
 
-\subsubsection{特征设计及其他}
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=.7\textwidth]{RON-loss-abnormal}
+	\caption{删除异常样本}
+\end{figure}
+
+
+\subsubsection{模型训练与验证}
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=.7\textwidth]{RON-loss-cross-validation}
+	\caption{对RON-loss进行交叉验证}
+\end{figure}
+
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=.7\textwidth]{S-cross-validation}
+	\caption{对S进行交叉验证}
+\end{figure}
+
 \subsection{问题四：主要变量操作方案的优化}
+
 \subsubsection{问题分析}
 
-巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话
-\subsubsection{场景建模或者其他}
+要求在保证产品硫含量不大于5μg/g的前提下，利用你们的模型获得325个数据样本(见附件四“325个数据样本数据.xlsx”)中，辛烷值（RON）损失降幅大于30%的样本对应的主要变量优化后的操作条件（优化过程中原料、待生吸附剂、再生吸附剂的性质保持不变，以它们在样本中的数据为准）。
 
-\subsubsection{特征设计及其他}
+
 \subsection{问题五：模型的可视化展示}
 \subsubsection{问题分析}
 
-巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话
-\subsubsection{场景建模或者其他}
-
-\subsubsection{特征设计及其他}
-
+工业装置为了平稳生产，优化后的主要操作变量（即：问题2中的主要变量）往往只能逐步调整到位，请你们对133号样本（原料性质、待生吸附剂和再生吸附剂的性质数据保持不变，以样本中的数据为准），以图形展示其主要操作变量优化调整过程中对应的汽油辛烷值和硫含量的变化轨迹。（各主要操作变量每次允许调整幅度值Δ见附件四“354个操作变量信息.xlsx”）。
 
 %第五章节
 %下面这块看看怎么改

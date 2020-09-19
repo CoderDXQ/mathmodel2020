@@ -15,6 +15,7 @@ from sklearn.metrics import r2_score
 from sklearn.preprocessing import QuantileTransformer
 from joblib import dump
 import warnings
+import seaborn as sns
 
 warnings.filterwarnings("ignore")
 X = pd.read_csv("../processed.csv")
@@ -53,6 +54,7 @@ def func(X: pd.DataFrame, y: pd.Series, selection_times=3, title="RON_loss", del
         mask = err > abnormal_threshold
         print(f"{title} | 异常样本数 = {np.count_nonzero(mask)}")
         plt.rcParams['figure.figsize'] = (7, 4.5)
+        plt.grid(alpha=0.2)
         plt.scatter(y[mask], y_pred[mask], label="abnormal samples", c="r")
         plt.scatter(y[~mask], y_pred[~mask], label="normal samples", c="b")
         plt.legend(loc="best")
@@ -61,7 +63,9 @@ def func(X: pd.DataFrame, y: pd.Series, selection_times=3, title="RON_loss", del
         y = y[~mask]
         print(f"{title} | 删除异常样本后的表现 = {cross_val_score(pipeline, X_, y, cv=cv).mean()}")
         plt.title(f"{title} abnormal samples")
-        plt.savefig(f"{title}_abnormal.png")
+        plt.xlabel("y true")
+        plt.ylabel("y pred")
+        plt.savefig(f"{title}_abnormal.pdf")
         plt.close()
     valid_scores = []
     plt.rcParams['figure.figsize'] = (18, 12)
@@ -73,20 +77,18 @@ def func(X: pd.DataFrame, y: pd.Series, selection_times=3, title="RON_loss", del
         pipeline.fit(X_train, y_train)
         y_pred = pipeline.predict(X_valid)
         plt.subplot(2, 3, i + 1)
-        plt.scatter(y_valid, y_pred)
-        plt.xlabel("y_valid")
-        plt.ylabel("y_pred")
+        sns.regplot(x="y true", y="y pred",
+                    data=pd.DataFrame({"y true": y_valid, "y pred": y_pred}))
         plt.title(f"fold-{i + 1}")
         valid_scores.append(r2_score(y_valid, y_pred))
     plt.subplot(2, 3, 6)
-    plt.scatter(y_, y_pred_)
-    plt.xlabel("y_true")
-    plt.ylabel("y_pred")
+    sns.regplot(x="y true", y="y pred",
+                data=pd.DataFrame({"y true": y_, "y pred": y_pred_}))
     plt.title(f"train-set")
     plt.suptitle(f"{title} cross-validation")
     print(f"{title} | 5折交叉验证后，在验证集上的平均r2 = {np.mean(valid_scores)}\n"
           f"{title} | 每折的r2 = {valid_scores}")
-    plt.savefig(f"{title}_cross-validation.png")
+    plt.savefig(f"{title}_cross-validation.pdf")
     plt.close()
     X_["label"] = y
     X_.to_csv(f"{title}_data.csv", index=False)
