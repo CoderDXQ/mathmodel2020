@@ -150,13 +150,13 @@
 
 TODO: 两图并列
 
-\begin{figure}[!h]
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=.7\textwidth]{313-fill-1}
 	\caption{S-ZORB.FT\_1204.PV}
 \end{figure}
 
-\begin{figure}[!h]
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=.7\textwidth]{313-fill-2}
 	\caption{D-121含硫污水排量}
@@ -168,19 +168,19 @@ TODO: 两图并列
 
 TODO： 三图并列
 
-\begin{figure}[!h]
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=.7\textwidth]{313-del-1}
 	\caption{D-106热氮气流量}
 \end{figure}
 
-\begin{figure}[!h]
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=.7\textwidth]{313-del-2}
 	\caption{S-ZORB.FT\_2431.DACA}
 \end{figure}
 
-\begin{figure}[!h]
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=.7\textwidth]{313-del-3}
 	\caption{3.0步骤FIC2432.SP}
@@ -188,6 +188,24 @@ TODO： 三图并列
 
 
 \subsubsection{剔除不在操作范围内的样本}
+
+考虑到“325个样本数据.xlsx”中的很多样本已经超出了“354个操作变量信息.xlsx”所规定的范围，我们进行了简单的处理，用“325个样本数据”中每个操作变量的最大与最小值来扩充“354个操作变量信息”中操作变量的范围，并用扩充后的操作变量范围代替原操作变量范围。
+
+经过计算，285样本数据中所有的采样数据都在操作变量范围内，而313样本数据仅有1个采样数据的所有变量在操作变量范围内。经过综合考虑，我们决定用以下公式来计算一个采样样本操出操作变量范围的程度：
+
+\begin{equation}
+	InvalidDegree=\sum^M_j{\frac{Exceed_j}{Upper_j - Lower_j}}
+	\label{eq:range-invalid-degree}
+\end{equation}
+
+其中，$j$表示某采样样本的第$j$个操作变量，$M$表示共有$M$个操作变量， $Upper_j$表示操作变量$j$的上界，$Lower_j$表示操作变量$j$的下界，$Exceed_j$表示操作变量$j$超出范围的大小。
+
+通过上述公式，我们对313样本的采样数据进行了计算：
+
+
+
+
+
 
 \subsubsection{用3$\sigma$准则删除异常样本}
 
