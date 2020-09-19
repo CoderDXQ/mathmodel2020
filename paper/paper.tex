@@ -6,6 +6,8 @@
 %\documentclass[withoutpreface,bwprint]{cumcmthesis} %去掉封面与编号页，电子版提交的时候使用。
 
 \usepackage[framemethod=TikZ]{mdframed}
+\usepackage{hyperref}
+\usepackage{tocloft}
 \title{全降低汽油精制过程中的辛烷值损失模型}
 
 
@@ -39,7 +41,7 @@
 
 问题四：唐麒淳
 
-问题五：唐麒淳
+问题五：戴维
 
 %填写关键字
 \keywords{分布转换\quad 基于模型的特征筛选\quad 贝叶斯优化\quad 5折交叉验证\quad TPE算法}
@@ -140,8 +142,6 @@
 
 问题一的目标是参考近4年的工业数据（325个数据样本数据.xlsx），依“样本确定方法”对285号和313号数据样本进行预处理，并加入到原工业数据中。
 
-
-
 \subsubsection{对含空值变量的分析}
 
 处理1：对时序上基本平稳的含空值变量做均值填充
@@ -150,13 +150,15 @@
 
 TODO: 两图并列
 
-\begin{figure}[h]
+
+\begin{figure}[htbp]
 	\centering
 	\includegraphics[width=.7\textwidth]{313-fill-1}
 	\caption{S-ZORB.FT\_1204.PV}
 \end{figure}
 
-\begin{figure}[h]
+
+\begin{figure}[htbp]
 	\centering
 	\includegraphics[width=.7\textwidth]{313-fill-2}
 	\caption{D-121含硫污水排量}
@@ -168,23 +170,27 @@ TODO: 两图并列
 
 TODO： 三图并列
 
-\begin{figure}[h]
+
+\begin{figure}[htbp]
 	\centering
 	\includegraphics[width=.7\textwidth]{313-del-1}
 	\caption{D-106热氮气流量}
 \end{figure}
 
-\begin{figure}[h]
+
+\begin{figure}[htbp]
 	\centering
 	\includegraphics[width=.7\textwidth]{313-del-2}
 	\caption{S-ZORB.FT\_2431.DACA}
 \end{figure}
 
-\begin{figure}[h]
+
+\begin{figure}[htbp]
 	\centering
 	\includegraphics[width=.7\textwidth]{313-del-3}
 	\caption{3.0步骤FIC2432.SP}
 \end{figure}
+
 
 
 \subsubsection{剔除不在操作范围内的样本}
@@ -202,14 +208,81 @@ TODO： 三图并列
 
 通过上述公式，我们对313样本的采样数据进行了计算：
 
+\begin{table}[!htbp]
+	\caption{313样本超出范围程度}\label{tab:001} \centering
+	\begin{tabular}{ccc}
+	\toprule[1.5pt]
+	time &  invalid-degree &  rank \\
+	\midrule[1pt]
+	2017-05-15 06:57:00 &        1.986283 &     0 \\
+	2017-05-15 07:24:00 &        1.868216 &     1 \\
+	2017-05-15 07:18:00 &        1.533825 &     2 \\
+	2017-05-15 06:33:00 &        1.514671 &     3 \\
+	2017-05-15 06:54:00 &        1.298304 &     4 \\
+	2017-05-15 06:51:00 &        1.057390 &     5 \\
+	2017-05-15 07:21:00 &        0.876193 &     6 \\
+	2017-05-15 07:51:00 &        0.866200 &     7 \\
+	2017-05-15 07:48:00 &        0.770276 &     8 \\
+	2017-05-15 07:54:00 &        0.658065 &     9 \\
+	\bottomrule[1.5pt]
+\end{tabular}
+\end{table}
 
+
+我们决定以$InvalidDegree >= 1$为阈值，删除满足其条件的所有采样样本
 
 
 
 
 \subsubsection{用3$\sigma$准则删除异常样本}
 
+3$\sigma$准则：设对被测量变量进行等精度测量，得到$x_1, x_2, \ldots, x_n$，算出其算术平均值$x$及剩余误差$v_i=x_i-x (i=1, 2, \ldots , n)$，并按贝塞尔公式算出标准误差$\sigma$，若某个测量值$x_b$的剩余误差$v_b ( 1 <= b <= n )$，满足 $|v_b| = | x_b - x | > 3\sigma$，则认为$x_b$是含有粗大误差值的坏值，应予剔除。贝塞尔公式如下：
+
+\begin{equation}\label{eq:3sigma}
+	\sigma = [\frac{1}{n-1}\sum_{i=1}^{n}v_i^2]^{\frac{1}{2}} = \{\frac{[\sum^n_{i=1}x_i^2 - (\sum^n_{i=1}x_i)^2/n]}{n-1}\}^{\frac{1}{2}}
+\end{equation}
+
+根据上述公式，285样本的所有采样都满足3$\sigma$准则，而313样本有27个采样不满足其条件，故删除这些不满足条件的变量。
+
+
+
 \subsubsection{对工业数据中的空值变量进行处理}
+
+通过上述操作，将313样本和285样本经过处理后加入到325个样本的工业数据中，并将4.1.2处理2（引用）中删除的变量设置为 $NaN$ ，待进一步的处理。
+
+考虑到工业设备巴拉巴拉（套话），我们认为0代表了工业数据中的空值。对于不同类型的情况，我们制定了3种处理空值的策略：
+
+\begin{equation}\label{eq:empty-strategies}
+\left\{
+\begin{aligned}
+delete \ column, \ & if \ len(EmptyElements)>50 \ and \ mean(vector)>5 \\  
+delete \ element, \ & if \ len(EmptyElements)<50 \ and \ mean(vector)>5\\  
+do \ not \ process, \ & if \ mean(vector)<=5
+\end{aligned}
+\right.
+\end{equation}
+
+根据公式（引用）中，如果某列空值元素的长度 $len(EmptyElements)$ 大于50，并且这列元素的均值 $ mean(vector)$ 大于5，说明空值较多，做空值填充的意义不大，应该将此列删除。如果某列空值元素的长度小于50，并且这列元素的均值大于5，说明空值相对较少，可以通过做空值填充保留下来。如果这列元素的均值小于等于5，说明这列元素基本为0，0可能不是这列元素的空值，所以不做处理。
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=.7\textwidth]{strategy-1}
+	\caption{策略1}
+\end{figure}
+
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=.7\textwidth]{strategy-2}
+	\caption{策略2}
+\end{figure}
+
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=.7\textwidth]{strategy-3}
+	\caption{策略3}
+\end{figure}
 
 \subsection{问题二：寻找建模主要变量}
 \subsubsection{问题分析}
@@ -224,6 +297,7 @@ TODO： 三图并列
 \subsubsection{问题分析}
 
 巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话
+
 \subsubsection{场景建模或者其他}
 
 \subsubsection{特征设计及其他}
