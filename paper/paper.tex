@@ -132,7 +132,68 @@
 
 %第四章节
 \section{问题分析与求解}
-\subsection{问题一：巴拉巴拉}
+\subsection{问题一：数据处理}
+\subsubsection{问题分析}
+
+由于（套话）原因，采集到的原始数据存在一些异常，包括（套话）
+
+
+问题一的目标是参考近4年的工业数据（325个数据样本数据.xlsx），依“样本确定方法”对285号和313号数据样本进行预处理，并加入到原工业数据中。
+
+
+
+\subsubsection{对含空值变量的分析}
+
+处理1：对时序上基本平稳的含空值变量做均值填充
+
+我们在313样本的数据中，发现了2个时序上基本平稳但含有空值的变量
+
+TODO: 两图并列
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=.7\textwidth]{313-fill-1}
+	\caption{S-ZORB.FT\_1204.PV}
+\end{figure}
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=.7\textwidth]{313-fill-2}
+	\caption{D-121含硫污水排量}
+\end{figure}
+
+对于这两个变量的空值用313样本数据的其余采样相应变量的均值来填充
+
+处理2：对时序上杂乱或呈周期趋势的含空值变量做删除操作
+
+TODO： 三图并列
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=.7\textwidth]{313-del-1}
+	\caption{D-106热氮气流量}
+\end{figure}
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=.7\textwidth]{313-del-2}
+	\caption{S-ZORB.FT\_2431.DACA}
+\end{figure}
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=.7\textwidth]{313-del-3}
+	\caption{3.0步骤FIC2432.SP}
+\end{figure}
+
+
+\subsubsection{剔除不在操作范围内的样本}
+
+\subsubsection{用3$\sigma$准则删除异常样本}
+
+\subsubsection{对工业数据中的空值变量进行处理}
+
+\subsection{问题二：寻找建模主要变量}
 \subsubsection{问题分析}
 
 巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话
@@ -141,30 +202,21 @@
 \subsubsection{特征设计及其他}
 
 
-\subsection{问题二：巴拉巴拉}
+\subsection{问题三：建立辛烷值（RON）损失预测模型}
 \subsubsection{问题分析}
 
 巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话
 \subsubsection{场景建模或者其他}
 
 \subsubsection{特征设计及其他}
-
-
-\subsection{问题三：巴拉巴拉}
+\subsection{问题四：主要变量操作方案的优化}
 \subsubsection{问题分析}
 
 巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话
 \subsubsection{场景建模或者其他}
 
 \subsubsection{特征设计及其他}
-\subsection{问题四：巴拉巴拉}
-\subsubsection{问题分析}
-
-巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话
-\subsubsection{场景建模或者其他}
-
-\subsubsection{特征设计及其他}
-\subsection{问题五：巴拉巴拉}
+\subsection{问题五：模型的可视化展示}
 \subsubsection{问题分析}
 
 巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话巴拉巴拉一堆话
@@ -194,7 +246,7 @@
 \section{加图的方法，记得删除}
 \begin{figure}[!h]
 \centering
-\includegraphics[width=.7\textwidth]{1.png}
+\includegraphics[width=.7\textwidth]{f1.png}
 \caption{问题三流程图}
 \end{figure}
 
