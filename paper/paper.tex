@@ -6,8 +6,8 @@
 %\documentclass[withoutpreface,bwprint]{cumcmthesis} %去掉封面与编号页，电子版提交的时候使用。
 
 \usepackage[framemethod=TikZ]{mdframed}
-\usepackage{hyperref}
-\usepackage{tocloft}
+%\usepackage{hyperref}
+%\usepackage{tocloft}
 \title{全降低汽油精制过程中的辛烷值损失模型}
 
 
@@ -58,7 +58,8 @@
 %\tableofcontents
 
 %生成目录
-\tableofcontents
+ \tableofcontents
+
 \newpage
 
 
@@ -96,7 +97,7 @@
 %第三章节
 \section{符号说明}
 
-\begin{table}[htbp]
+\begin{table}[htb]
     \centering
     \caption{论文中用到的符号定义}
 	\begin{tabular}{cc}
@@ -151,14 +152,14 @@
 TODO: 两图并列
 
 
-\begin{figure}[htbp]
+\begin{figure}[ht]
 	\centering
 	\includegraphics[width=.7\textwidth]{313-fill-1}
 	\caption{S-ZORB.FT\_1204.PV}
 \end{figure}
 
 
-\begin{figure}[htbp]
+\begin{figure}[ht]
 	\centering
 	\includegraphics[width=.7\textwidth]{313-fill-2}
 	\caption{D-121含硫污水排量}
@@ -171,21 +172,21 @@ TODO: 两图并列
 TODO： 三图并列
 
 
-\begin{figure}[htbp]
+\begin{figure}[]
 	\centering
 	\includegraphics[width=.7\textwidth]{313-del-1}
 	\caption{D-106热氮气流量}
 \end{figure}
 
 
-\begin{figure}[htbp]
+\begin{figure}[ht]
 	\centering
 	\includegraphics[width=.7\textwidth]{313-del-2}
 	\caption{S-ZORB.FT\_2431.DACA}
 \end{figure}
 
 
-\begin{figure}[htbp]
+\begin{figure}[ht]
 	\centering
 	\includegraphics[width=.7\textwidth]{313-del-3}
 	\caption{3.0步骤FIC2432.SP}
@@ -208,7 +209,7 @@ TODO： 三图并列
 
 通过上述公式，我们对313样本的采样数据进行了计算：
 
-\begin{table}[!htbp]
+\begin{table}[ht]
 	\caption{313样本超出范围程度}\label{tab:001} \centering
 	\begin{tabular}{ccc}
 	\toprule[1.5pt]
@@ -264,21 +265,21 @@ do \ not \ process, \ & if \ mean(vector)<=5
 
 根据公式（引用）中，如果某列空值元素的长度 $len(EmptyElements)$ 大于50，并且这列元素的均值 $ mean(vector)$ 大于5，说明空值较多，做空值填充的意义不大，应该将此列删除。如果某列空值元素的长度小于50，并且这列元素的均值大于5，说明空值相对较少，可以通过做空值填充保留下来。如果这列元素的均值小于等于5，说明这列元素基本为0，0可能不是这列元素的空值，所以不做处理。
 
-\begin{figure}[htbp]
+\begin{figure}[ht]
 	\centering
 	\includegraphics[width=.7\textwidth]{strategy-1}
 	\caption{策略1}
 \end{figure}
 
 
-\begin{figure}[htbp]
+\begin{figure}[ht]
 	\centering
 	\includegraphics[width=.7\textwidth]{strategy-2}
 	\caption{策略2}
 \end{figure}
 
 
-\begin{figure}[htbp]
+\begin{figure}[ht]
 	\centering
 	\includegraphics[width=.7\textwidth]{strategy-3}
 	\caption{策略3}
