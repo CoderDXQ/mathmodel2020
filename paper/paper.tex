@@ -8,6 +8,7 @@
 \usepackage[framemethod=TikZ]{mdframed}
 \usepackage{float}
 \usepackage{placeins}
+\usepackage{subcaption} % 子标题
 %\usepackage{hyperref}
 %\usepackage{tocloft}
 \title{全降低汽油精制过程中的辛烷值损失模型}
@@ -162,19 +163,35 @@
 
 TODO: 两图并列
 
-
-\begin{figure}[!htb]
-	\centering
-	\includegraphics[width=.7\textwidth]{313-fill-1}
-	\caption{S-ZORB.FT\_1204.PV}
+\begin{figure}
+    \centering
+    \begin{minipage}[c]{0.48\textwidth}
+        \centering
+        \includegraphics[height=0.3\textheight]{313-fill-1}
+        \subcaption{S-ZORB.FT\_1204.PV}
+    \end{minipage}
+    \begin{minipage}[c]{0.48\textwidth}
+        \centering
+        \includegraphics[height=0.3\textheight]{313-fill-2}
+        \subcaption{D-121含硫污水排量}
+    \end{minipage}
+    \caption{？？？？？？？？？}
 \end{figure}
 
 
-\begin{figure}[!htb]
-	\centering
-	\includegraphics[width=.7\textwidth]{313-fill-2}
-	\caption{D-121含硫污水排量}
-\end{figure}
+
+% \begin{figure}[!htb]
+% 	\centering
+% 	\includegraphics[width=.7\textwidth]{313-fill-1}
+% 	\caption{S-ZORB.FT\_1204.PV}
+% \end{figure}
+
+
+% \begin{figure}[!htb]
+% 	\centering
+% 	\includegraphics[width=.7\textwidth]{313-fill-2}
+% 	\caption{D-121含硫污水排量}
+% \end{figure}
 
 对于这两个变量的空值用313样本数据的其余采样相应变量的均值来填充
 
@@ -183,25 +200,46 @@ TODO: 两图并列
 TODO： 三图并列
 
 
-\begin{figure}[!htb]
-	\centering
-	\includegraphics[width=.7\textwidth]{313-del-1}
-	\caption{D-106热氮气流量}
+\begin{figure}
+    \centering
+    \begin{minipage}[c]{0.48\textwidth}
+        \centering
+        \includegraphics[height=0.3\textheight]{313-del-1}
+        \subcaption{D-106热氮气流量}
+    \end{minipage}
+    \begin{minipage}[c]{0.48\textwidth}
+        \centering
+        \includegraphics[height=0.3\textheight]{313-del-2}
+        \subcaption{S-ZORB.FT\_2431.DACA}
+    \end{minipage}
+     \begin{minipage}[c]{0.48\textwidth}
+        \centering
+        \includegraphics[height=0.3\textheight]{313-del-3}
+        \subcaption{3.0步骤FIC2432.SP}
+    \end{minipage}
+    \caption{？？？？？？？？？}
 \end{figure}
 
 
-\begin{figure}[!htb]
-	\centering
-	\includegraphics[width=.7\textwidth]{313-del-2}
-	\caption{S-ZORB.FT\_2431.DACA}
-\end{figure}
+% \begin{figure}[!htb]
+% 	\centering
+% 	\includegraphics[width=.7\textwidth]{313-del-1}
+% 	\caption{D-106热氮气流量}
+% \end{figure}
 
 
-\begin{figure}[!htb]
-	\centering
-	\includegraphics[width=.7\textwidth]{313-del-3}
-	\caption{3.0步骤FIC2432.SP}
-\end{figure}
+% \begin{figure}[!htb]
+% 	\centering
+% 	\includegraphics[width=.7\textwidth]{313-del-2}
+% 	\caption{S-ZORB.FT\_2431.DACA}
+% \end{figure}
+
+
+% \begin{figure}[!htb]
+% 	\centering
+% 	\includegraphics[width=.7\textwidth]{313-del-3}
+% 	\caption{3.0步骤FIC2432.SP}
+% \end{figure}
 
 
 
