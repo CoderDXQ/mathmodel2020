@@ -312,22 +312,26 @@ do \ not \ process, \ & if \ mean(vector)<=5
 三种策略的处理结果数据如下：
 
 
+
+
+
+
 \begin{figure}[htb]
 	\centering
 	\begin{minipage}[c]{0.4\textwidth}
 		\centering
 		\includegraphics[width=0.32\textheight]{strategy-1}
-		\caption{策略1}
+		\subcaption{策略1}
 	\end{minipage}
 	\begin{minipage}[c]{0.4\textheight}
 		\centering
 		\includegraphics[width=0.32\textheight]{strategy-2}
-		\caption{策略2}
+		\subcaption{策略2}
 	\end{minipage}
 	\begin{minipage}[c]{0.4\textwidth}
 		\centering
 		\includegraphics[width=0.32\textheight]{strategy-3}
-		\caption{策略3}
+		\subcaption{策略3}
 	\end{minipage}
 	\caption{3种处理空值的策略}
 \end{figure}
@@ -341,27 +345,60 @@ do \ not \ process, \ & if \ mean(vector)<=5
 
 建立降低辛烷值损失模型涉及包括7个原料性质、2个待生吸附剂性质、2个再生吸附剂性质、2个产品性质等变量以及另外354个操作变量（共计367个变量），工程技术应用中经常使用先降维后建模的方法，这有利于忽略次要因素，发现并分析影响模型的主要变量与因素。
 
-寻找主要变量的方法有两类，一类是用PCA等方法做降维
+寻找主要变量的方法有两类，一类方法是主成分分析（Principal Component Analysis, PCA），其所要做的就是设法将原来众多
+具有一定相关性的变量，重新组合为一组新的相互无关的综合变量来代替原来的
+变量。通常，数学上的处理方法就是将原来的变量做线性组合，作为新的综合变
+量。另一类方式是特征筛选，通过剔除无关变量与混淆变量，保留主要变量与关键变量，从而提升后续机器学习建模过程的表现。
+
+在本题中，虽然PCA方法也能起到降维的作用，但考虑到问题3与问题4需要对主要变量进行优化，而不是PCA计算得到的主成分变量，所以我们决定使用特征筛选方法寻找建模主要变量。
 
 在本题中，虽然我们有大量的特征可使用，有的特征携带的信息丰富，有的特征携带的信息有重叠，有的特征则属于无关特征，如果所有特征不经筛选地全部作为训练特征，经常会出现维度灾难问题，甚至会降低模型的准确性。因此，我们需要进行特征筛选，排除无效/冗余的特征，把有用的特征挑选出来作为模型的训练数据。
 
+特征筛选的方法又分为3类，分别是Filter方法（过滤式），Wrapper方法（封装式）和Embedded方法（嵌入式）：
 
+\begin{enumerate}
+	\item 过滤式：主要思想是对每一维特征“打分”，即给每一维的特征赋予权重，这样的权重就代表着该特征的重要性，然后依据权重排序。主要方法有卡方检验（Chi--squared Test），信息增益（Information Gain），相关系数（Correlation Coefficient Scores）等方法。
+	\item 封装式：主要思想是将子集的选择看作是一个搜索寻优问题，生成不同的组合，对组合进行评价，再与其他的组合进行比较。这样就将子集的选择看作是一个优化问题，这里有很多的优化算法可以解决，尤其是一些启发式的优化算法，如GA、PSO等。最为经典的代表是\texttt{scikit-learn}实现的递归特征消除法（Recursion Feature Elimination, RFE）
+	\item 嵌入式：主要思想是在模型既定的情况下学习出对提高模型准确性最好的特征，也就是在确定模型的过程中，挑选出那些对模型的训练有重要意义的特征。主要方法有用带有L1正则化的项完成特征选择（也可以结合L2惩罚项来优化）、随机森林平均不纯度减少法/平均精确度减少法。
+\end{enumerate}
 
+经过实践，发现虽然过滤式虽然计算速度快，但是并不能准确地筛选出关键特征；封装式虽然筛选效果好，但是计算速度很慢；嵌入式的筛选效果与封装式基本持平，但计算速度相对快很多，故选择嵌入式特征筛选方法。
+
+% 从这抄的 https://blog.csdn.net/yangxudong/article/details/53899260
+
+GBDT模型能够在建模过程中计算各个特征的特征重要度。在GBDT模型中，特征$j$的全局重要度通过特征$j$在单颗树中的重要度的平均值来衡量： 
+\begin{equation}\label{eq:gbdt-1}
+	\hat{J^2_j} = \frac{1}{M} \sum^M_{m=1}\hat{J^2_j}(T_m)
+\end{equation}
+
+其中，$M$是树的数量。特征$j$在单颗树中的重要度的如下：
+
+\begin{equation}\label{eq:gbdt-2}
+	\hat{J^2_j} = \frac{1}{M} \sum^{L-1}_{t=1}\hat{i^2_t} I (v_t=j)
+\end{equation}
+
+其中， $L$ 为树的叶子节点数量，$L−1$ 即为树的非叶子节点数量（构建的树都是具有左右孩子的二叉树），$_t$ 是和节点t相关联的特征，$\hat{i^2_t}$是节点$t$分裂之后平方损失的减少值。
+
+考虑到GBDT模型的准确性与鲁棒性，我们选用GBDT模型作为嵌入式特征筛选法的基模型。GBDT采用的是\texttt{sklearn.ensemble.GradientBoostingRegressor}，嵌入式特征筛选采用的是\texttt{sklearn.feature\_selection.SelectFromModel}。
 
 \FloatBarrier
 \subsubsection{通过特征筛选获取主要变量}
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=.7\textwidth]{feature-selection-perfs}
-	\caption{特征筛选n次后剩余特征数}
+	\begin{minipage}[c]{0.4\textwidth}
+		\centering
+		\includegraphics[width=0.32\textheight]{feature-selection-perfs}
+		\subcaption{特征筛选n次后剩余特征数}
+	\end{minipage}
+	\begin{minipage}[c]{0.4\textheight}
+		\centering
+		\includegraphics[width=0.32\textheight]{feature-selection-feats}
+		\subcaption{特征筛选次数与$r^2$评价指标的关系}
+	\end{minipage}
+	\caption{3种处理空值的策略}
 \end{figure}
 
-\begin{figure}[htb]
-	\centering
-	\includegraphics[width=.7\textwidth]{feature-selection-feats}
-	\caption{特征筛选次数与$r^2$评价指标的关系}
-\end{figure}
 
 \begin{table}[!htbp]
 	\caption{特征筛选n次后的各指标}\label{tab:001} \centering
