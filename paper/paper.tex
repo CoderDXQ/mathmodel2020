@@ -122,8 +122,11 @@
 %有序列表 这里写论文的模型假设
 %左侧缩进可能还需要调整
 \begin{enumerate}[itemindent=20pt]
-	\item 假设一
-	\item 假设二
+	\item 题干描述的空值为0。
+	\item 不考虑本题所给数据以外信息对辛烷值损失与硫含量的影响。
+	\item 去除异常数据，不影响数据的整体分布情况。
+	\item 选择的特征参数集能够反映原数据的主要特征。
+	\item 问题3训练的模型能反映操作变量与产品性质之间的关系。
 \end{enumerate}
 
 
@@ -139,11 +142,11 @@
 	\toprule
 	 \makebox[0.4\textwidth][c]{符号}	&  \makebox[0.5\textwidth][c]{意义} \\ 
 	 \midrule
-	 D	    & 木条宽度（cm）  \\
-	 N	    & 第n根木条  \\ 
-	   \midrule
-	 T	    & 木条根数  \\
+	 T	    & 木条根数   \\
 	 H	    & 桌子高度（cm）  \\
+	 \midrule
+	 CV	    & 交叉验证（Cross Validation） \\
+	 GBDT	& 梯度提升数（Gradient Boosting Decision tree）  \\ 
 	 \bottomrule
 	\end{tabular}
     \label{tab:addlabel}%
@@ -177,114 +180,74 @@
 \FloatBarrier
 \subsubsection{问题分析}
 
-？？？？？？？？？处理一下这些文字@唐麒淳
-
-
-
-
 由于每套装置的数据均有部分位点存在问题：部分变量只含有部分时间段的数据，部分变量的数据全部为空值或部分数据为空值。因此对原始数据进行处理后才可以使用。
 
-问题一的目标是参考近4年的工业数据（325个数据样本数据.
+问题一的目标是参考近4年的工业数据的预处理结果，根据附件的样本确定方法对285号样本与313号样本的数据进行处理，并将处理后的285号样本与313号样本加入到原工业数据中。对于原工业数据的空值，我们设计了数据处理方法进行处理。
 
-数据处理方法如下：
-（1）对于只含有部分时间点的位点，如果其残缺数据较多，无法补充，将此类位点删除；
-（2）删除325个样本中数据全部为空值的位点；
-（3）对于部分数据为空值的位点，空值处用其前后两个小时数据的平均值代替；
-（4）根据工艺要求与操作经验，总结出原始数据变量的操作范围，然后采用最大最小的限幅方法剔除一部分不在此范围的样本；
-（5）根据拉依达准则（3σ准则）去除异常值。
-3σ准则：设对被测量变量进行等精度测量，得到x1，x2，……，xn，算出其算术平均值x及剩余误差vi=xi-x（i=1,2,...,n），并按贝塞尔公式算出标准误差σ，若某个测量值xb的剩余误差vb（1<=b<=n），满足|vb|=|xb-x|>3σ，则认为xb是含有粗大误差值的坏值，应予剔除。
 
 本题目标为降低S Zorb装置产品辛烷值损失，故确定样本的主要依据为样品的辛烷值数据。由于辛烷值的测定数据相对于操作变量数据而言相对较少，而且辛烷值的测定往往滞后，因此确定某个样本的方法为：以辛烷值数据测定的时间点为基准时间，取其前2个小时的操作变量数据的平均值作为对应辛烷值的操作变量数据。
 
 \FloatBarrier
 \subsubsection{对含空值变量的分析}
 
+经过分析，我们发现285号样本的“新氢进装置流量”、“1#催化汽油进装置流量”等操作变量全部为空值0，但其余操作变量不含空值。考虑到最后需要取其前2个小时的操作变量数据的平均值作为对应辛烷值的操作变量数据，所以最后汇总得到的相应的操作变量值仍是0，故我们暂时不对这类变量做处理，留到\ref{sec:process-all-nan}中处理。
+
+经过分析，我们发现313号样本除了“新氢进装置流量”等操作变量与上文描述的一样也全部为空值0以外，还有部分操作变量只含有部分空值。对于这类操作变量，我们制定了2种处理策略：
+
 处理1：对时序上基本平稳的含空值变量做均值填充
 
-在313样本的数据中，发现了2个时序上基本平稳但含有空值的变量，对于这两个变量的空值用313样本数据的其余采样相应变量的均值来填充。
+在313号样本的数据中，我们发现了2个时序上基本平稳但含有空值的变量。考虑到本题确定某个样本的方法为：以辛烷值数据测定的时间点为基准时间，取其前2个小时的操作变量数据的平均值作为对应辛烷值的操作变量数据。故对于这两个变量的空值用313号样本数据的其余采样相应变量的均值来填充。
 
 
 \begin{figure}[htb]
     \centering
-    \begin{minipage}[c]{0.48\textwidth}
+    \begin{minipage}[c]{0.35\textwidth}
         \centering
-        \includegraphics[height=0.3\textheight]{313-fill-1}
+        \includegraphics[height=0.2\textheight]{313-fill-1}
         \subcaption{S-ZORB.FT\_1204.PV}
     \end{minipage}
-    \begin{minipage}[c]{0.48\textwidth}
+    \begin{minipage}[c]{0.35\textwidth}
         \centering
-        \includegraphics[height=0.3\textheight]{313-fill-2}
+        \includegraphics[height=0.2\textheight]{313-fill-2}
         \subcaption{D-121含硫污水排量}
     \end{minipage}
-    \caption{？？？？？？？？？}
+    \caption{313号样本处理1中的2个变量}
 \end{figure}
-
-
-
-% \begin{figure}[!htb]
-% 	\centering
-% 	\includegraphics[width=.7\textwidth]{313-fill-1}
-% 	\caption{S-ZORB.FT\_1204.PV}
-% \end{figure}
-
-
-% \begin{figure}[!htb]
-% 	\centering
-% 	\includegraphics[width=.7\textwidth]{313-fill-2}
-% 	\caption{D-121含硫污水排量}
-% \end{figure}
-
 
 
 处理2：对时序上杂乱或呈周期趋势的含空值变量做删除操作
 
+在313号样本的数据中，我们发现了3个时序上杂乱或呈周期趋势的含空值变量但含有空值的变量 。考虑到本题对于只含有部分时间点的位点，如果其残缺数据较多，无法补充，应将此类位点删除，所以我们将313号样本的这3个变量设为$NaN$，留到\ref{sec:process-all-nan}中处理。
+
+
 
 \begin{figure}[htb]
     \centering
-    \begin{minipage}[c]{0.48\textwidth}
+    \begin{minipage}[c]{0.35\textwidth}
         \centering
-        \includegraphics[height=0.3\textheight]{313-del-1}
+        \includegraphics[height=0.2\textheight]{313-del-1}
         \subcaption{D-106热氮气流量}
     \end{minipage}
-    \begin{minipage}[c]{0.48\textwidth}
+    \begin{minipage}[c]{0.35\textwidth}
         \centering
-        \includegraphics[height=0.3\textheight]{313-del-2}
+        \includegraphics[height=0.2\textheight]{313-del-2}
         \subcaption{S-ZORB.FT\_2431.DACA}
     \end{minipage}
-     \begin{minipage}[c]{0.48\textwidth}
+     \begin{minipage}[c]{0.35\textwidth}
         \centering
-        \includegraphics[height=0.3\textheight]{313-del-3}
+        \includegraphics[height=0.2\textheight]{313-del-3}
         \subcaption{3.0步骤FIC2432.SP}
     \end{minipage}
-    \caption{？？？？？？？？？}
+    \caption{313号样本处理2中的3个变量}
 \end{figure}
 
 
-% \begin{figure}[!htb]
-% 	\centering
-% 	\includegraphics[width=.7\textwidth]{313-del-1}
-% 	\caption{D-106热氮气流量}
-% \end{figure}
-
-
-% \begin{figure}[!htb]
-% 	\centering
-% 	\includegraphics[width=.7\textwidth]{313-del-2}
-% 	\caption{S-ZORB.FT\_2431.DACA}
-% \end{figure}
-
-
-% \begin{figure}[!htb]
-% 	\centering
-% 	\includegraphics[width=.7\textwidth]{313-del-3}
-% 	\caption{3.0步骤FIC2432.SP}
-% \end{figure}
 
 
 \FloatBarrier
 \subsubsection{剔除不在操作范围内的样本}
 
-考虑到“325个样本数据.xlsx”中的很多样本已经超出了“354个操作变量信息.xlsx”所规定的范围，我们进行了简单的处理，用“325个样本数据”中每个操作变量的最大与最小值来扩充“354个操作变量信息”中操作变量的范围，并用扩充后的操作变量范围代替原操作变量范围。
+考虑到“325个样本数据”中的很多样本已经超出了“354个操作变量信息”所规定的范围，我们进行了简单的处理，用“325个样本数据”中每个操作变量的最大与最小值来扩充“354个操作变量信息”中操作变量的范围，并用扩充后的操作变量范围代替原操作变量范围。
 
 经过计算，285样本数据中所有的采样数据都在操作变量范围内，而313样本数据仅有1个采样数据的所有变量在操作变量范围内。经过综合考虑，我们决定用以下公式来计算一个采样样本操出操作变量范围的程度：
 
@@ -335,7 +298,7 @@
 
 
 \FloatBarrier
-\subsubsection{对工业数据中的空值变量进行处理}
+\subsubsection{对工业数据中的空值变量进行处理}\label{sec:process-all-nan}
 
 通过前述操作，将313样本和285样本经过处理后加入到325个样本的工业数据中，并将4.1.2处理2（引用）中删除的变量设置为 $NaN$ ，待进一步的处理。
 
