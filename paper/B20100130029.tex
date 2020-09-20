@@ -481,6 +481,7 @@ GBDT模型能够在建模过程中计算各个特征的特征重要度。在GBDT
 \end{figure}
 
 
+
 \FloatBarrier
 \subsection{问题三：建立辛烷值（RON）损失预测模型}\label{sec:modeling}
 
@@ -493,15 +494,24 @@ GBDT模型能够在建模过程中计算各个特征的特征重要度。在GBDT
 
 \textbf{实验设计}
 
-\textbf{数据预处理}
+本实验的实验数据采用章节\ref{sec:data-process}处理得到的$325 \times 347$的数据。实验目标是结合章节\ref{sec:feature-selection}得到的特征筛选器，设计一个机器学习管线（详见\textbf{模型设计}），并通过5折交叉验证（5-folds Cross Validation, 5CV）的方式，在$r^2$评价指标下表现最好。
 
-考虑到所选特征的取值范围差异较大，如“加热炉主火嘴瓦斯入口压力”的取值范围是$[0.05, 0]$，“R-101下部床层压降”的取值范围是$[0, 120]$，容易造成不同尺度特征间难以比较的问题。缩放可以有效地解决上述问题，让变量之间可比性增强。除了特征之间尺度不同，特征的异常值与非标注化分布也会对模型的鲁棒性与泛化能力造成影响。
+\begin{equation}\label{eq:r2}
+	r^2=1-\frac{\sum_i^N(\hat{y^{(i)}}-y^{(i)})^2}{\sum_i^N(\bar{y}-y^{(i)})^2}
+\end{equation}
+
+$r^2$ 的计算方法见公式\eqref{eq:r2}，其中$\sum_i^N(\bar{y}-y^{(i)})^2$表示使用预测产生的错误，是baseline，其中$\sum_i^N(\hat{y^{(i)}}-y^{(i)})^2$表示使用待验证模型才生的错误。$r^2$的取值范围为$(-\inf, 1]$，应该越大越好。
+
 
 \textbf{模型设计}
 
-QuantileTransformer 也可以把每个特征转换到0-1均匀分布或者$\mathbb{N}(0,1)$的正态分布中。它执行的转换可以平滑掉非正常的分布，所以受到奇异点的影响比传统的StandardScaler要少。
 
-根据章节\ref{sec:feature-selection}得到的特征筛选器，组建了如图\ref{img:ml-pipeline}的机器学习管线。
+考虑到所选特征的取值范围差异较大，如“加热炉主火嘴瓦斯入口压力”的取值范围是$[0.05, 0]$，“R-101下部床层压降”的取值范围是$[0, 120]$，容易造成不同尺度特征间难以比较的问题。缩放可以有效地解决上述问题，让变量之间可比性增强。除了特征之间尺度不同，特征的异常值与非正常分布也会对模型的鲁棒性与泛化能力造成影响。
+
+QuantileTransformer 可以把每个特征转换到0-1均匀分布或者$\mathbb{N}(0,1)$的正态分布中。它执行的转换可以平滑掉非正常的分布，所以受到奇异点的影响比传统的StandardScaler要少。
+
+
+根据章节\ref{sec:feature-selection}得到的特征筛选器，与上述的QuantileTransformer，组建了如图\ref{img:ml-pipeline}的机器学习管线。
 
 \begin{figure}[htb]
 	\centering
@@ -510,29 +520,38 @@ QuantileTransformer 也可以把每个特征转换到0-1均匀分布或者$\math
 	\label{img:ml-pipeline}
 \end{figure}
 
+该机器学习管线的处理流程为：先用QuantileTransformer将数据的分布进行转换，转换为者$\mathbb{N}(0,1)$的正态分布。然后用GBDT selector筛选出章节\ref{sec:feature-selection}得到的12个关键特征，最后用LGBMRegressor对筛选后的数据进行训练。
+
 \FloatBarrier
-\subsubsection{删除异常样本}
+\subsubsection{模型训练与验证}
+
+通过上文初步建立的模型，对实验数据进行训练与验证得到的$r^2$=0.2179，其效果不能满足预期。经过分析，认为实验数据含有部分异常样本，需要将这些异常样本从实验数据中甄别并剔除。
+
+检测异常样本的方法是用实验数据对机器学习管线进行训练，并在原数据上进行预测，并用的公式的方法\ref{eq:err}计算误差，如果误差大于阈值$E_t$，则认为是异常样本。
+
+\begin{equation}\label{eq:err}
+	E=|y-\hat{y}|
+\end{equation}
+
 
 \begin{figure}[htb]
 	\centering
 	\includegraphics[width=.7\textwidth]{RON-loss-abnormal}
 	\caption{删除异常样本}
+	\label{img:abnormal}
 \end{figure}
 
-\FloatBarrier
-\subsubsection{模型训练与验证}
+经过多次实验，我们确定阈值$E_t$=0.08，在该阈值下删除了60个样本。实验结果如图\ref{img:abnormal}所示。
+
+删除异常样本后，在5CV下$r^2$=0.3727，说明原实验数据受异常样本影响较大，删除异常样本后模型能达到不错的效果。
+
+最后我们用5CV方法划分了5个不同的训练集与验证集，进行了综合地评估，在5次验证中验证集的$r^2$评价指标分别为0.477, 0.409, 0.289, 0.362, 0.324，均值为0.3727，模型表现稳定，具有鲁棒性与泛化能力。在训练集上$r^2$评价指标为0.911，pearson相关系数为0.9648，见图\ref{RON-loss-cv}。
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=.7\textwidth]{RON-loss-cross-validation}
-	\caption{对RON-loss进行交叉验证}
-\end{figure}
-
-
-\begin{figure}[htb]
-	\centering
-	\includegraphics[width=.7\textwidth]{S-cross-validation}
-	\caption{对S进行交叉验证}
+	\includegraphics[width=1\textwidth]{RON-loss-cross-validation}
+	\caption{对RON损失进行交叉验证}
+	\label{RON-loss-cv}
 \end{figure}
 
 \subsection{问题四：主要变量操作方案的优化}
