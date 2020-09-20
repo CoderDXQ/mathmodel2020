@@ -464,7 +464,7 @@ GBDT模型能够在建模过程中计算各个特征的特征重要度。在GBDT
 对于筛选得到的12个主要变量，我们依据特征重要度取前4个变量加上预测目标RON损失一起做一个相关性分析，得到了图6所示的相关性矩阵图。我们根据pearson相关系数公式\eqref{eq:pearson}计算了12个主要变量加上RON损失两两之间的相关系数，并绘制了图7所示的特征相关系数热力图。
 
 \begin{equation}\label{eq:pearson}
-	\rho_X,Y=\frac{X,Y}{\sigma_X\sigma_Y}
+	\rho_{X,Y}=\frac{X,Y}{\sigma_X\sigma_Y}
 \end{equation}
 
 
