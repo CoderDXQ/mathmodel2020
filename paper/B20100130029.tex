@@ -560,7 +560,7 @@ QuantileTransformer 可以把每个特征转换到0-1均匀分布或者$\mathbb{
 \subsection{问题四：主要变量操作方案的优化}
 
 \FloatBarrier
-\subsubsection{问题分析}
+\subsubsection{问题分析}\label{sec:opt-problem-analyze}
 
 
 
@@ -616,7 +616,7 @@ Sequential model-based optimization (SMBO) 是贝叶斯优化的最简形式，�
 \end{itemize}
 
 \begin{equation}\label{eq:EI}
-	EI(X)=\mathbb{E}_max(f(x)-f(x^+), 0)
+	EI(X)=\mathbb{E}_{max}(f(x)-f(x^+), 0)
 \end{equation}
 
 TPE全称Tree-structured Parzen Estimator，是用GMM（Gaussian Mixture Model）来学习超参模型的一种方法。
@@ -635,7 +635,7 @@ TPE全称Tree-structured Parzen Estimator，是用GMM（Gaussian Mixture Model�
 根据EI公式\eqref{eq:EI}，将其带入公式\eqref{eq:lxgx}，发现只要能${\arg\min}_x{g(x)/l(x)}$就能${\arg\min}_x{EI(x)}$。
 
 \begin{equation}\label{EIlxgx}
-	EI_{y^*}(x) \to (\gamma+\frac{g(x)}{l(x)}(1 - \gamma))^{-1}
+	EI_{y^*}(x) \propto (\gamma+\frac{g(x)}{l(x)}(1 - \gamma))^{-1}
 \end{equation}
 
 综上，TPE的原理就是建立两个分布：优势样本的分布于劣势样本的分布。TPE在每次迭代中按照这样的规则去采样：采样的样本在优势样本分布$l(x)$中的概率密度尽量大，在劣势样本分布$g(x)$中的概率密度尽量小，本质上是逐渐增大在优势样本附近采样率的一个启发式优化过程。
@@ -670,58 +670,83 @@ TPE全称Tree-structured Parzen Estimator，是用GMM（Gaussian Mixture Model�
 		\centering
 		\includegraphics[height=0.3\textheight]{S-dist(after-RON-opt)}
 		\subcaption{对RON损失优化后硫的分布图}
+		\label{img:joint-S-dist}
 	\end{minipage}
 	\caption{313号样本处理2中的3个变量}
 \end{figure}
 
 
-用之前得到的硫预测模型作为评价函数，以与硫含量相关的8个主要变量作为待优化变量，并根据操作变量的取值范围得到一个参数空间$\mathbb{H}_S \in \mathbb{R}^8$，用贝叶斯优化库\texttt{HyperOpt}的TPE算法对工业数据的325个样本逐一进行优化。
+
+以与硫含量相关的8个主要变量（见章节\ref{sec:opt-problem-analyze}）作为待优化变量，并根据操作变量的取值范围得到一个参数空间$\mathbb{H}_S \in \mathbb{R}^8$。
+用之前得到的硫预测模型作为优化过程的评价函数$g(s), s\in \mathbb{H}_S$，
+用贝叶斯优化库\texttt{HyperOpt}的TPE算法对工业数据的325个样本逐一进行优化，每次优化迭代50次。
 
 单独对参数空间$\mathbb{H}_S$优化后，产品硫含量的分布图见图\ref{img:single-S-dist}。可以看到产品的硫分布被压缩到了区间$[0,5)$中了。
 
 
 
 \FloatBarrier
-\subsubsection{对辛烷损失进行优化}
+\subsubsection{对RON损失进行优化}
+
+以与RON损失含量相关的11个主要变量（见表\ref{tab:003}）作为待优化变量，并根据操作变量的取值范围得到一个参数空间$\mathbb{H}_R \in \mathbb{R}^{11}$。
+用之前得到的RON损失预测模型作为评价函数$f(r), r\in \mathbb{H}_R$。
+
+
+
+但实际使用时并不能直接用$f(r)$作为优化过程的评价函数。如流程图\ref{img:opt-flowchat}所示，硫与RON损失有一个操作变量重合，虽然在上一步中通过调整与硫相关的8个操作变量是的目前产品硫含量大幅下降，但是在优化RON损失的过程中可能在调整这一重合的操作变量时会导致产品硫含量超出题设范围。故对RON损失的评价函数做出调整，如公式\eqref{eq:RON-evaluation}所示，用调整后的$\hat{f}(r)$代替$f(r)$：
+
+\begin{equation}\label{eq:RON-evaluation}
+	\hat{f} = f(r)+{\infty \times \max({0},{g(s)-5}) } \ \ \ \ r\in \mathbb{H}_R \ \ s\in \mathbb{H}_S 
+\end{equation}
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=.7\textwidth]{RON-dist}
+	\includegraphics[width=.5\textwidth]{RON-dist}
 	\caption{优化前后的RON损失分布图}
+	\label{img:RON-compare}
 \end{figure}
 
+更新评价函数后，如之前的操作，对工业数据的325个样本逐一进行优化，每次优化迭代50次。优化前后RON损失的分布图如图\ref{img:RON-compare}所示，可见RON损失在优化后被压缩到了$[0.8, 1.2]$附近的区域。
 
-
-
-\begin{figure}[htb]
-	\centering
-	\includegraphics[width=.7\textwidth]{RON-loss-decrease}
-	\caption{RON损失降幅直方图}
-\end{figure}
+优化后产品硫含量分布如图\ref{img:joint-S-dist}所示，可见分布在$S=5$处呈截断的痕迹，但仍有3个样本超出了$S\le 5$的限制，这3个样本在表\ref{tab:exceed-S-constraint}中列出。
 
 \begin{table}[htb]
-	\caption{3个优化后不符合约束条件的异常样本}\label{tab:004} \centering
+	\caption{3个优化后不符合约束条件的异常样本}\label{tab:exceed-S-constraint} \centering
 	\begin{tabular}{ccccc}
 		\toprule[1.5pt]
-	 time &  原硫含量($\mu g/g$) &  优化后硫含($\mu g/g$) &  原RON损失 &  优化后RON损失 \\
+		time &  原硫含量($\mu g/g$) &  优化后硫含($\mu g/g$) &  原RON损失 &  优化后RON损失 \\
 		\midrule[1pt]
-2017/11/10 8:00:00 &              4.2 &               6.30 &    1.10 &      0.99 \\
-2017/11/6 8:00:00 &              6.2 &               5.70 &    1.10 &      0.91 \\
-2017/9/18 8:00:00 &              3.8 &               6.86 &    1.21 &      0.89 \\  
+		2017/11/10 8:00:00 &              4.2 &               6.30 &    1.10 &      0.99 \\
+		2017/11/6 8:00:00 &              6.2 &               5.70 &    1.10 &      0.91 \\
+		2017/9/18 8:00:00 &              3.8 &               6.86 &    1.21 &      0.89 \\  
 		\bottomrule[1.5pt]
 	\end{tabular}
 \end{table}
 
+优化后，有55个样本的RON损失降幅大于30\%，占比为16.92\%。RON损失降幅情况见图\ref{img:RON-loss-descrease}。
+
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=1.0\textwidth]{main-op-opt-0}
+	\includegraphics[width=.5\textwidth]{RON-loss-decrease}
+	\caption{RON损失降幅直方图}
+	\label{img:RON-loss-descrease}
+\end{figure}
+
+
+为了更好地对比优化RON损失前后主要操作变量的变化情况，绘制了11个主要操作变量和产品辛烷值（常量）的分布图，如图\ref{img:main-op-opt-0}和图\ref{img:main-op-opt-1}所示。
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=0.85\textwidth]{main-op-opt-0}
 	\caption{优化前后6个操作变量的分布}
+	\label{img:main-op-opt-0}
 \end{figure}
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=1.0\textwidth]{main-op-opt-1}
+	\includegraphics[width=0.85\textwidth]{main-op-opt-1}
 	\caption{RON与优化前后的5个操作变量的分布}
+	\label{img:main-op-opt-1}
 \end{figure}
 
 \FloatBarrier
