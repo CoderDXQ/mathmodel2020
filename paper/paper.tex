@@ -11,7 +11,7 @@
 \usepackage{subcaption} % 子标题
 %\usepackage{hyperref}
 %\usepackage{tocloft}
-\title{全降低汽油精制过程中的辛烷值损失模型}
+\title{降低汽油精制过程中的辛烷值损失模型}
 
 
 %参赛信息
@@ -186,7 +186,7 @@
 
 处理1：对时序上基本平稳的含空值变量做均值填充
 
-我们在313样本的数据中，发现了2个时序上基本平稳但含有空值的变量，对于这两个变量的空值用313样本数据的其余采样相应变量的均值来填充。
+在313样本的数据中，发现了2个时序上基本平稳但含有空值的变量，对于这两个变量的空值用313样本数据的其余采样相应变量的均值来填充。
 
 
 \begin{figure}[htb]
@@ -280,7 +280,7 @@
 
 其中，$j$表示某采样样本的第$j$个操作变量，$M$表示共有$M$个操作变量， $Upper_j$表示操作变量$j$的上界，$Lower_j$表示操作变量$j$的下界，$Exceed_j$表示操作变量$j$超出范围的大小。
 
-通过上述公式，我们对313样本的采样数据进行了计算：
+使用上述公式，对313样本的采样数据进行计算，结果如下：
 
 \begin{table}[htb]
 	\caption{313样本超出范围程度}\label{tab:001} \centering
@@ -303,7 +303,7 @@
 \end{table}
 
 
-我们决定以$InvalidDegree >= 1$为阈值，删除满足其条件的所有采样样本
+经过？？？？？？？？？？？？？？，我们决定以$InvalidDegree >= 1$为阈值，删除满足其条件的所有采样样本。
 
 
 
@@ -322,9 +322,9 @@
 \FloatBarrier
 \subsubsection{对工业数据中的空值变量进行处理}
 
-通过上述操作，将313样本和285样本经过处理后加入到325个样本的工业数据中，并将4.1.2处理2（引用）中删除的变量设置为 $NaN$ ，待进一步的处理。
+通过前述操作，将313样本和285样本经过处理后加入到325个样本的工业数据中，并将4.1.2处理2（引用）中删除的变量设置为 $NaN$ ，待进一步的处理。
 
-考虑到工业设备巴拉巴拉（套话），我们认为0代表了工业数据中的空值。对于不同类型的情况，我们制定了3种处理空值的策略：
+考虑到工业设备？？？？？？？？？？？？，我们认为0代表了工业数据中的空值。对于不同类型的情况，我们制定了3种处理空值的策略：
 
 \begin{equation}\label{eq:empty-strategies}
 \left\{
@@ -337,24 +337,25 @@ do \ not \ process, \ & if \ mean(vector)<=5
 \end{equation}
 
 根据公式（引用）中，如果某列空值元素的长度 $len(EmptyElements)$ 大于50，并且这列元素的均值 $ mean(vector)$ 大于5，说明空值较多，做空值填充的意义不大，应该将此列删除。如果某列空值元素的长度小于50，并且这列元素的均值大于5，说明空值相对较少，可以通过做空值填充保留下来。如果这列元素的均值小于等于5，说明这列元素基本为0，0可能不是这列元素的空值，所以不做处理。
+三种策略的处理结果数据如下：
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=.7\textwidth]{strategy-1}
+	\includegraphics[width=1.0\textwidth]{strategy-1}
 	\caption{策略1}
 \end{figure}
 
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=.7\textwidth]{strategy-2}
+	\includegraphics[width=1.0\textwidth]{strategy-2}
 	\caption{策略2}
 \end{figure}
 
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=.7\textwidth]{strategy-3}
+	\includegraphics[width=1.0\textwidth]{strategy-3}
 	\caption{策略3}
 \end{figure}
 
