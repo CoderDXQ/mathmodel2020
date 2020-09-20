@@ -675,7 +675,13 @@ QuantileTransformer 可以把每个特征转换到0-1均匀分布或者$\mathbb{
 
 \FloatBarrier
 \subsubsection{问题建模}
-我们使用改进的启发式搜素A\*算法求解该问题。我们对该问题建模如下：首先12个主要变量中，只有11个是操作变量，这11维操作变量的数值可以看成11维空间中的一个位置的坐标。记原始的坐标为x，第四问优化后的变量为y，所以实际就是求解在11维空间中由x到y的一条路径，其中路径的途径点不能超过所有变量的取值范围组成的11维立方体，且不能经过11维立方体中使硫产量大于5的区域，路径应尽量短，而且每一步在每一个维度上步幅都不应超过对应操作变量允许调整的幅度值Δ。为简化问题以及减少计算量，我们假设每一个操作变量的每一次调整都刚好等于Δ（最后一步除外，最后一次是小于等于Δ）。第三问得到的预测硫和辛烷值损失的模型记为硫产量$S=S(x)$，辛烷值损失$NON\_LOSS=N(X)$。
+我们使用改进的启发式搜素A\*算法求解该问题。A*算法的流程图如下：
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=0.8\textwidth]{axing}
+	\caption{A*算法的流程图}
+\end{figure}
+我们对该问题建模如下：首先12个主要变量中，只有11个是操作变量，这11维操作变量的数值可以看成11维空间中的一个位置的坐标。记原始的坐标为x，第四问优化后的变量为y，所以实际就是求解在11维空间中由x到y的一条路径，其中路径的途径点不能超过所有变量的取值范围组成的11维立方体，且不能经过11维立方体中使硫产量大于5的区域，路径应尽量短，而且每一步在每一个维度上步幅都不应超过对应操作变量允许调整的幅度值Δ。为简化问题以及减少计算量，我们假设每一个操作变量的每一次调整都刚好等于Δ（最后一步除外，最后一次是小于等于Δ）。第三问得到的预测硫和辛烷值损失的模型记为硫产量$S=S(x)$，辛烷值损失$NON\_LOSS=N(X)$。
 
 
 \FloatBarrier
@@ -745,9 +751,9 @@ x1=[121.3461, 34.4524, 4.9924, 0.0386, 120.7679, 52.7805, 321.5952, 32.7367, 8.8
 
 \begin{thebibliography}{99}  
 \bibitem{ref1}Zheng L, Wang S, Tian L, et al., Query-adaptive late fusion for image search and person re-identification, Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, 2015: 1741-1750.  
-\bibitem{ref2}Arandjelović R, Zisserman A, Three things everyone should know to improve object retrieval, Computer Vision and Pattern Recognition (CVPR), 2012 IEEE Conference on, IEEE, 2012: 2911-2918.  
-\bibitem{ref3}Lowe D G. Distinctive image features from scale-invariant keypoints, International journal of computer vision, 2004, 60(2): 91-110.  
-\bibitem{ref4}Philbin J, Chum O, Isard M, et al. Lost in quantization: Improving particular object retrieval in large scale image databases, Computer Vision and Pattern Recognition, 2008. CVPR 2008, IEEE Conference on, IEEE, 2008: 1-8.  
+% \bibitem{ref2}Arandjelović R, Zisserman A, Three things everyone should know to improve object retrieval, Computer Vision and Pattern Recognition (CVPR), 2012 IEEE Conference on, IEEE, 2012: 2911-2918.  
+% \bibitem{ref3}Lowe D G. Distinctive image features from scale-invariant keypoints, International journal of computer vision, 2004, 60(2): 91-110.  
+% \bibitem{ref4}Philbin J, Chum O, Isard M, et al. Lost in quantization: Improving particular object retrieval in large scale image databases, Computer Vision and Pattern Recognition, 2008. CVPR 2008, IEEE Conference on, IEEE, 2008: 1-8.  
 \end{thebibliography}
 
 
@@ -758,31 +764,31 @@ x1=[121.3461, 34.4524, 4.9924, 0.0386, 120.7679, 52.7805, 321.5952, 32.7367, 8.8
 % \bibliography{example}
 
 
-%参考文献 2019年大学生数学建模比赛的模板中提取的
-\begin{thebibliography}{9}%宽度9
-    \bibitem{1}{liuhaiyang2013latex}
-    刘海洋.
-    \newblock \LaTeX {}入门\allowbreak[J].
-    \newblock 电子工业出版社, 北京, 2013.
-    \bibitem{2}{mathematical-modeling}
-    全国大学生数学建模竞赛论文格式规范 (2020 年 8 月 25 日修改).
-    \bibitem{3} \url{https://www.latexstudio.net}
-\end{thebibliography}
+% %参考文献 2019年大学生数学建模比赛的模板中提取的
+% \begin{thebibliography}{9}%宽度9
+%     \bibitem{1}{liuhaiyang2013latex}
+%     刘海洋.
+%     \newblock \LaTeX {}入门\allowbreak[J].
+%     \newblock 电子工业出版社, 北京, 2013.
+%     \bibitem{2}{mathematical-modeling}
+%     全国大学生数学建模竞赛论文格式规范 (2020 年 8 月 25 日修改).
+%     \bibitem{3} \url{https://www.latexstudio.net}
+% \end{thebibliography}
 
 
 
-？？？？？？？？？记得删掉
-@article{scikit-learn,
- title={Scikit-learn: Machine Learning in {P}ython},
- author={Pedregosa, F. and Varoquaux, G. and Gramfort, A. and Michel, V.
-         and Thirion, B. and Grisel, O. and Blondel, M. and Prettenhofer, P.
-         and Weiss, R. and Dubourg, V. and Vanderplas, J. and Passos, A. and
-         Cournapeau, D. and Brucher, M. and Perrot, M. and Duchesnay, E.},
- journal={Journal of Machine Learning Research},
- volume={12},
- pages={2825--2830},
- year={2011}
-}
+% ？？？？？？？？？记得删掉
+% @article{scikit-learn,
+%  title={Scikit-learn: Machine Learning in {P}ython},
+%  author={Pedregosa, F. and Varoquaux, G. and Gramfort, A. and Michel, V.
+%          and Thirion, B. and Grisel, O. and Blondel, M. and Prettenhofer, P.
+%          and Weiss, R. and Dubourg, V. and Vanderplas, J. and Passos, A. and
+%          Cournapeau, D. and Brucher, M. and Perrot, M. and Duchesnay, E.},
+%  journal={Journal of Machine Learning Research},
+%  volume={12},
+%  pages={2825--2830},
+%  year={2011}
+% }
 
 
 
