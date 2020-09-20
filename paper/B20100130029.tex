@@ -575,7 +575,7 @@ QuantileTransformer 可以把每个特征转换到0-1均匀分布或者$\mathbb{
 
 考虑到有硫含量的约束，所以先对操作变量与硫含量的关系进行建模。建模使用的回归器与机器学习管线与章节\ref{sec:modeling}中的相一致，其中特征筛选得到了9个关键变量：'精制汽油出装置硫含量'，'混氢点氢气流量'，'还原器温度'，'D203出口燃料气流量'，'D-123压力'，'烟气出对流室温度'，'冷氮气过滤器ME-114差压'，'R-102底喷头压差'。其中产品硫含量为常数，其余8个为可调整的操作变量。
 
-分析\textbf{与RON损失相关的11个操作变量}和\textbf{与S损失相关的8个操作变量}，两者交集为\textbf{“精炼汽油出装置硫含量”}。分析原工业数据的产品硫含量，其中有59个样本的硫含量超过了5$\mu$/g 。故应该先对硫含量进行优化，将325个样本的产品硫含量都优化到5$\mu$/g一下；然后对产品的RON损失值进行优化。因为操作变量“精炼汽油出装置硫含量”与RON损失相关，所以在对RON损失优化的过程中需要增加对产品硫含量的约束，使其满足题设条件；最后，如果有样本优化后仍不满足硫含量的约束，视其为异常样本，将其删除。算法流程图见图\ref{img:opt-flowchat}所示。
+分析\textbf{与RON损失相关的11个操作变量}和\textbf{与硫相关的8个操作变量}，两者交集为\textbf{“精炼汽油出装置硫含量”}。分析原工业数据的产品硫含量，其中有59个样本的硫含量超过了5$\mu$/g 。故应该先对硫含量进行优化，将325个样本的产品硫含量都优化到5$\mu$/g一下；然后对产品的RON损失值进行优化。因为操作变量“精炼汽油出装置硫含量”与RON损失相关，所以在对RON损失优化的过程中需要增加对产品硫含量的约束，使其满足题设条件；最后，如果有样本优化后仍不满足硫含量的约束，视其为异常样本，将其删除。算法流程图见图\ref{img:opt-flowchat}所示。
 
 \begin{figure}[htb]
 	\centering
@@ -638,7 +638,7 @@ TPE全称Tree-structured Parzen Estimator，是用GMM（Gaussian Mixture Model�
 	EI_{y^*}(x) \to (\gamma+\frac{g(x)}{l(x)}(1 - \gamma))^{-1}
 \end{equation}
 
-综上，TPE的原理就是建立两个分布：优势样本的分布于劣势样本的分布。TPE在每次迭代中按照这样的规则去采样：采样的样本在优势样本分布$l(x)$中的概率密度尽量大，在劣势样本分布$g(x)$中的概率密度尽量小，本质上是主键增大在优势样本附近采样率的一个启发式优化过程。
+综上，TPE的原理就是建立两个分布：优势样本的分布于劣势样本的分布。TPE在每次迭代中按照这样的规则去采样：采样的样本在优势样本分布$l(x)$中的概率密度尽量大，在劣势样本分布$g(x)$中的概率密度尽量小，本质上是逐渐增大在优势样本附近采样率的一个启发式优化过程。
 
 
 
@@ -646,37 +646,43 @@ TPE全称Tree-structured Parzen Estimator，是用GMM（Gaussian Mixture Model�
 \FloatBarrier
 \subsubsection{对产品硫含量进行优化}
 
-对于辛烷值进行特征筛选，选出的主要操作变量是：'稳定塔下部温度'， '精制汽油出装置温度'， '精制汽油出装置硫含量'， '加热炉主火嘴瓦斯入口压力'， 'E-101D壳程出口管温度'， 'D-204液位'， 'D-102温度'， 'R-101下部床层压降'， 'P-101B入口过滤器差压'， 'F-101出口支管\#4温度'， 'D101原料缓冲罐压力'；对于硫进行建模，选出的主要操作变量是：'精制汽油出装置硫含量'，'混氢点氢气流量'，'还原器温度'，'D203出口燃料气流量'，'D-123压力'，'烟气出对流室温度'，'冷氮气过滤器ME-114差压'，'R-102底喷头压差'， 两组操作变量的交集是'精制汽油出装置硫含量'。
 
-原工业数据的产品硫含量的分布图如下，其中大于5$\mu g/g$的样本有59个，占 $18.15\%$。
+原工业数据的产品硫含量的分布图见图\ref{img:origin-S-dist}，其中大于5$\mu g/g$的样本有59个，占 $18.15\%$。
 
-\begin{figure}[htb]
-	\centering
-	\includegraphics[width=.7\textwidth]{S-dist}
-	\caption{原工业数据硫含量的分布图}
-\end{figure}
-
-用之前得到的硫预测模型作为评价函数，以与硫含量相关的8个主要变量作为待优化变量，并根据操作变量的取值范围得到一个参数空间，用贝叶斯优化库HyperOpt对工业数据的325个样本逐一进行优化。
-
+可以看到原工业数据的产品硫含量为长尾分布，充斥着大量硫含量偏高的样本。
 
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=.7\textwidth]{S-dist(after-opt)}
-	\caption{单独对与硫相关的8个操作变量优化后硫含量的分布图}
+	\begin{minipage}[c]{0.4\textwidth}
+		\centering
+		\includegraphics[height=0.3\textheight]{S-dist}
+		\subcaption{原工业数据硫含量的分布图}
+		\label{img:origin-S-dist}
+	\end{minipage}
+	\begin{minipage}[c]{0.4\textwidth}
+		\centering
+		\includegraphics[height=0.3\textheight]{S-dist(after-opt)}
+		\subcaption{单独对与硫优化后的分布图}
+		\label{img:single-S-dist}
+	\end{minipage}
+	\begin{minipage}[c]{0.4\textwidth}
+		\centering
+		\includegraphics[height=0.3\textheight]{S-dist(after-RON-opt)}
+		\subcaption{对RON损失优化后硫的分布图}
+	\end{minipage}
+	\caption{313号样本处理2中的3个变量}
 \end{figure}
 
+
+用之前得到的硫预测模型作为评价函数，以与硫含量相关的8个主要变量作为待优化变量，并根据操作变量的取值范围得到一个参数空间$\mathbb{H}_S \in \mathbb{R}^8$，用贝叶斯优化库\texttt{HyperOpt}的TPE算法对工业数据的325个样本逐一进行优化。
+
+单独对参数空间$\mathbb{H}_S$优化后，产品硫含量的分布图见图\ref{img:single-S-dist}。可以看到产品的硫分布被压缩到了区间$[0,5)$中了。
 
 
 
 \FloatBarrier
 \subsubsection{对辛烷损失进行优化}
-
-\begin{figure}[htb]
-	\centering
-	\includegraphics[width=.7\textwidth]{S-dist(after-RON-opt)}
-	\caption{对RON-loss优化后硫含量的分布图}
-\end{figure}
 
 \begin{figure}[htb]
 	\centering
