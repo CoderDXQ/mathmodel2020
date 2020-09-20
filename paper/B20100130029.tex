@@ -173,15 +173,15 @@
 \FloatBarrier
 \subsubsection{对含空值变量的分析}\label{sec:empty-analyze}
 
-考虑到工业设备传感器失效或异常时记录值为0，我们认为0代表了工业数据中的空值。
+考虑到工业设备传感器失效或异常时记录值为0，在此认为0代表了工业数据中的空值。
 
-经过分析，我们发现285号样本的“新氢进装置流量”、“1\#催化汽油进装置流量”等操作变量全部为空值0，但其余操作变量不含空值。考虑到最后需要取其前2个小时的操作变量数据的平均值作为对应辛烷值的操作变量数据，所以最后汇总得到的相应的操作变量值仍是0，故我们暂时不对这类变量做处理，留到\ref{sec:process-all-nan}中处理。
+经过分析可以发现285号样本的“新氢进装置流量”、“1\#催化汽油进装置流量”等操作变量全部为空值0，但其余操作变量不含空值。考虑到最后需要取其前2个小时的操作变量数据的平均值作为对应辛烷值的操作变量数据，所以最后汇总得到的相应的操作变量值仍是0，故暂时不对这类变量做处理，留到\ref{sec:process-all-nan}中处理。
 
-经过分析，我们发现313号样本除了“新氢进装置流量”等操作变量与上文描述的一样也全部为空值0以外，还有部分操作变量只含有部分空值。对于这类操作变量，我们制定了2种处理策略：
+经过分析，容易发现313号样本除了“新氢进装置流量”等操作变量与上文描述的一样也全部为空值0以外，还有部分操作变量只含有部分空值。对于这类操作变量，制定了2种处理策略：
 
 \textbf{处理1}：对时序上基本平稳的含空值变量做均值填充
 
-在313号样本的数据中，我们发现了2个时序上基本平稳但含有空值的变量。考虑到本题确定某个样本的方法为：以辛烷值数据测定的时间点为基准时间，取其前2个小时的操作变量数据的平均值作为对应辛烷值的操作变量数据。故对于这两个变量的空值用313号样本数据的其余采样相应变量的均值来填充。
+在313号样本的数据中，容易发现2个时序上基本平稳但含有空值的变量。考虑到本题确定某个样本的方法为：以辛烷值数据测定的时间点为基准时间，取其前2个小时的操作变量数据的平均值作为对应辛烷值的操作变量数据。故对于这两个变量的空值用313号样本数据的其余采样相应变量的均值来填充。
 
 
 \begin{figure}[htb]
@@ -202,7 +202,7 @@
 
 \textbf{处理2}：对时序上杂乱或呈周期趋势的含空值变量做删除操作
 
-在313号样本的数据中，我们发现了3个时序上杂乱或呈周期趋势的含空值变量但含有空值的变量 。考虑到本题对于只含有部分时间点的位点，如果其残缺数据较多，无法补充，应将此类位点删除，所以我们将313号样本的这3个变量设为$NaN$，留到\ref{sec:process-all-nan}中处理。
+在313号样本的数据中，容易发现3个时序上杂乱或呈周期趋势的含空值变量但含有空值的变量 。考虑到本题对于只含有部分时间点的位点，如果其残缺数据较多，无法补充，应将此类位点删除，所以将313号样本的这3个变量设为$NaN$，留到\ref{sec:process-all-nan}中处理。
 
 
 
@@ -232,9 +232,9 @@
 \FloatBarrier
 \subsubsection{剔除不在操作范围内的样本}
 
-考虑到“325个样本数据”中的很多样本已经超出了“354个操作变量信息”所规定的范围，我们进行了简单的处理，用“325个样本数据”中每个操作变量的最大与最小值来扩充“354个操作变量信息”中操作变量的范围，并用扩充后的操作变量范围代替原操作变量范围。
+考虑到“325个样本数据”中的很多样本已经超出了“354个操作变量信息”所规定的范围，于是应该进行简单的处理，用“325个样本数据”中每个操作变量的最大与最小值来扩充“354个操作变量信息”中操作变量的范围，并用扩充后的操作变量范围代替原操作变量范围。
 
-经过计算，285样本数据中所有的采样数据都在操作变量范围内，而313样本数据仅有1个采样数据的所有变量在操作变量范围内。经过综合考虑，我们决定用以下公式来计算一个采样样本操出操作变量范围的程度：
+经过计算，285样本数据中所有的采样数据都在操作变量范围内，而313样本数据仅有1个采样数据的所有变量在操作变量范围内。经过综合考虑，决定用以下公式来计算一个采样样本操出操作变量范围的程度：
 
 \begin{equation}
 	InvalidDegree=\sum^M_j{\frac{Exceed_j}{Upper_j - Lower_j}}
@@ -266,7 +266,7 @@
 \end{table}
 
 
-经过综合考虑，我们决定以$InvalidDegree >= 1$为阈值，删除满足其条件的所有采样样本。
+经过综查阅相关文献和讨论，在此决定以$InvalidDegree >= 1$为阈值，删除满足其条件的所有采样样本。
 
 
 
@@ -287,7 +287,7 @@
 
 通过前述操作，将313样本和285样本经过处理后加入到325个样本的工业数据中，并将\ref{sec:empty-analyze}处理2中删除的变量设置为 $NaN$ ，待进一步的处理。
 
-对于不同类型的情况，我们制定了3种处理空值的策略：
+对于不同类型的情况，制定3种处理空值的策略：
 
 \begin{equation}\label{eq:empty-strategies}
 \left\{
@@ -299,7 +299,7 @@ do \ not \ process, \ & if \ mean(vector)<=5
 \right.
 \end{equation}
 
-根据公式\eqref{eq:empty-strategies}，对于工业数据中的空值我们有3种处理策略：
+根据公式\eqref{eq:empty-strategies}，对于工业数据中的空值有3种处理策略：
 
 \newcounter{mylist}
 \begin{list}{策略\themylist}{\usecounter{mylist}}
@@ -336,7 +336,7 @@ do \ not \ process, \ & if \ mean(vector)<=5
 	\caption{3种处理空值的策略}
 \end{figure}
 
-对于策略2与\ref{sec:empty-analyze}中填充的$NaN$，我们用每列其余变量的均值代替，具体方法用的是\texttt{scikit-learn}的\texttt{impute.SimpleImpute} 。
+对于策略2与\ref{sec:empty-analyze}中填充的$NaN$，用每列其余变量的均值代替，具体方法用的是\texttt{scikit-learn}的\texttt{impute.SimpleImpute} 。
 
 \FloatBarrier
 \subsection{问题二：寻找建模主要变量}
@@ -350,9 +350,9 @@ do \ not \ process, \ & if \ mean(vector)<=5
 变量。通常，数学上的处理方法就是将原来的变量做线性组合，作为新的综合变
 量。另一类方式是特征筛选，通过剔除无关变量与混淆变量，保留主要变量与关键变量，从而提升后续机器学习建模过程的表现。
 
-在本题中，虽然PCA方法也能起到降维的作用，但考虑到问题3与问题4需要对主要变量进行优化，而不是PCA计算得到的主成分变量，所以我们决定使用特征筛选方法寻找建模主要变量。
+在本题中，虽然PCA方法也能起到降维的作用，但考虑到问题3与问题4需要对主要变量进行优化，而不是PCA计算得到的主成分变量，所以决定在此使用特征筛选方法寻找建模主要变量。
 
-在本题中，虽然我们有大量的特征可使用，有的特征携带的信息丰富，有的特征携带的信息有重叠，有的特征则属于无关特征，如果所有特征不经筛选地全部作为训练特征，经常会出现维度灾难问题，甚至会降低模型的准确性。因此，我们需要进行特征筛选，排除无效/冗余的特征，把有用的特征挑选出来作为模型的训练数据。
+在本题中，虽然有大量的特征可使用，有的特征携带的信息丰富，有的特征携带的信息有重叠，有的特征则属于无关特征，如果所有特征不经筛选地全部作为训练特征，经常会出现维度灾难问题，甚至会降低模型的准确性。因此，必须需要进行特征筛选，排除无效/冗余的特征，把有用的特征挑选出来作为模型的训练数据。
 
 
 
@@ -384,7 +384,7 @@ GBDT模型能够在建模过程中计算各个特征的特征重要度。在GBDT
 
 其中， $L$ 为树的叶子节点数量，$L−1$ 即为树的非叶子节点数量（构建的树都是具有左右孩子的二叉树），$_t$ 是和节点t相关联的特征，$\hat{i^2_t}$是节点$t$分裂之后平方损失的减少值。
 
-考虑到GBDT模型的准确性与鲁棒性，我们选用GBDT模型作为嵌入式特征筛选法的基模型。GBDT采用的是\texttt{sklearn.ensemble.GradientBoostingRegressor}，嵌入式特征筛选采用的是\texttt{sklearn.feature\_selection.SelectFromModel}。
+考虑到GBDT模型的准确性与鲁棒性优势，选用GBDT模型作为嵌入式特征筛选法的基模型。GBDT采用的是\texttt{sklearn.ensemble.GradientBoostingRegressor}，嵌入式特征筛选采用的是\texttt{sklearn.feature\_selection.SelectFromModel}。
 
 \begin{figure}[htb]
 	\centering
@@ -461,7 +461,7 @@ GBDT模型能够在建模过程中计算各个特征的特征重要度。在GBDT
 
 
 
-对于筛选得到的12个主要变量，我们依据特征重要度取前4个变量加上预测目标RON损失一起做一个相关性分析，得到了图6所示的相关性矩阵图。我们根据pearson相关系数公式\eqref{eq:pearson}计算了12个主要变量加上RON损失两两之间的相关系数，并绘制了图7所示的特征相关系数热力图。
+对于筛选得到的12个主要变量，依据特征重要度取前4个变量加上预测目标RON损失一起做一个相关性分析，得到了图6所示的相关性矩阵图。根据pearson相关系数公式\eqref{eq:pearson}计算了12个主要变量加上RON损失两两之间的相关系数，并绘制了图7所示的特征相关系数热力图。
 
 \begin{equation}\label{eq:pearson}
 	\rho_{X,Y}=\frac{X,Y}{\sigma_X\sigma_Y}
@@ -541,11 +541,11 @@ QuantileTransformer 可以把每个特征转换到0-1均匀分布或者$\mathbb{
 	\label{img:abnormal}
 \end{figure}
 
-经过多次实验，我们确定阈值$E_t$=0.08，在该阈值下删除了60个样本。实验结果如图\ref{img:abnormal}所示。
+经过多次实验，确定阈值$E_t$=0.08，在该阈值下删除了60个样本。实验结果如图\ref{img:abnormal}所示。
 
 删除异常样本后，在5CV下$r^2$=0.3727，说明原实验数据受异常样本影响较大，删除异常样本后模型能达到不错的效果。
 
-最后我们用5CV方法划分了5个不同的训练集与验证集，进行了综合地评估，在5次验证中验证集的$r^2$评价指标分别为0.477, 0.409, 0.289, 0.362, 0.324，均值为0.3727，模型表现稳定，具有鲁棒性与泛化能力。在训练集上$r^2$评价指标为0.911，pearson相关系数为0.9648，见图\ref{RON-loss-cv}。
+最后用5CV方法划分了5个不同的训练集与验证集，进行了综合地评估，在5次验证中验证集的$r^2$评价指标分别为0.477, 0.409, 0.289, 0.362, 0.324，均值为0.3727，模型表现稳定，具有鲁棒性与泛化能力。在训练集上$r^2$评价指标为0.911，pearson相关系数为0.9648，见图\ref{RON-loss-cv}。
 
 \begin{figure}[htb]
 	\centering
@@ -554,6 +554,9 @@ QuantileTransformer 可以把每个特征转换到0-1均匀分布或者$\mathbb{
 	\label{RON-loss-cv}
 \end{figure}
 
+
+
+\FloatBarrier
 \subsection{问题四：主要变量操作方案的优化}
 
 \FloatBarrier
@@ -653,7 +656,7 @@ TPE全称Tree-structured Parzen Estimator，是用GMM（Gaussian Mixture Model�
 	\caption{原工业数据硫含量的分布图}
 \end{figure}
 
-我们用之前得到的硫预测模型作为评价函数，以与硫含量相关的8个主要变量作为待优化变量，并根据操作变量的取值范围得到一个参数空间，用贝叶斯优化库HyperOpt对工业数据的325个样本逐一进行优化。
+用之前得到的硫预测模型作为评价函数，以与硫含量相关的8个主要变量作为待优化变量，并根据操作变量的取值范围得到一个参数空间，用贝叶斯优化库HyperOpt对工业数据的325个样本逐一进行优化。
 
 
 
@@ -721,18 +724,35 @@ TPE全称Tree-structured Parzen Estimator，是用GMM（Gaussian Mixture Model�
 \FloatBarrier
 \subsubsection{问题分析}
 
-第三问中我们选出了12个主要变量，在第四问中我们对包括133样本在内的许多样本进行了优化，其中133样本可以通过改变一些操作变量实现在硫含量不高于5（单位）的情况下辛烷值损失降低至0.8828。而在这一问我们需要找出由原先的操作条件，逐步调整为优化后的操作条件的调整路径，使得每一次调整幅度不超过操作变量每次允许调整幅度值Δ，同时，每一步操作变量对应的状态产生的硫不应该高于$5μg/g$。而且，操作变量调整过程中不应超出变量的操作范围（操作变量的范围由经验值以及附件中给出的操作变量信息共同划定）。
+本文已经在问题三的解答中选出了12个主要变量，在问题四中对包括133样本在内的许多样本进行了优化，其中133样本可以通过改变一些操作变量实现在硫含量不高于5（单位）的情况下辛烷值损失降低至0.8828。而在这一问我们需要找出由原先的操作条件，逐步调整为优化后的操作条件的调整路径，使得每一次调整幅度不超过操作变量每次允许调整幅度值Δ，同时，每一步操作变量对应的状态产生的硫不应该高于$5μg/g$。而且，操作变量调整过程中不应超出变量的操作范围（操作变量的范围由经验值以及附件中给出的操作变量信息共同划定）。
 
 \FloatBarrier
 \subsubsection{问题建模}
-我们使用改进的启发式搜素A\*算法求解该问题。我们对该问题建模如下：首先12个主要变量中，只有11个是操作变量，这11维操作变量的数值可以看成11维空间中的一个位置的坐标。记原始的坐标为x，第四问优化后的变量为y，所以实际就是求解在11维空间中由x到y的一条路径，其中路径的途径点不能超过所有变量的取值范围组成的11维立方体，且不能经过11维立方体中使硫产量大于5的区域，路径应尽量短，而且每一步在每一个维度上步幅都不应超过对应操作变量允许调整的幅度值Δ。为简化问题以及减少计算量，我们假设每一个操作变量的每一次调整都刚好等于Δ（最后一步除外，最后一次是小于等于Δ）。第三问得到的预测硫和辛烷值损失的模型记为硫产量$S=S(x)$，辛烷值损失$NON\_LOSS=N(X)$。
+考虑到工程实际情况，在此使用改进的启发式搜素A\*算法求解该问题。本问题的处理流程图及A*算法的流程图如下：
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1.0\textwidth]{5lct}
+	\caption{模型的可视化展示总体流程图}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{axing}
+	\caption{A*算法的流程图}
+\end{figure}
+对该问题建模如下：首先12个主要变量中，只有11个是操作变量，这11维操作变量的数值可以看成11维空间中的一个位置的坐标。记原始的坐标为x，第四问优化后的变量为y，所以实际就是求解在11维空间中由x到y的一条路径，其中路径的途径点不能超过所有变量的取值范围组成的11维立方体，且不能经过11维立方体中使硫产量大于5的区域，路径应尽量短，而且每一步在每一个维度上步幅都不应超过对应操作变量允许调整的幅度值Δ。为简化问题以及减少计算量，假设每一个操作变量的每一次调整都刚好等于Δ（最后一步除外，最后一次是小于等于Δ）。第三问得到的预测硫和辛烷值损失的模型记为硫产量$S=S(x)$，辛烷值损失$NON\_LOSS=N(X)$。
 
 
 \FloatBarrier
 \subsubsection{模型优化}
-建模过程中我们发现，在11维空间中运行A*算法需要非常巨大的计算资源，于是我们决定进一步优化计算模型。我们用起始点x与终点y坐标的距离向量，元素除以对应的Δ，然后向上取整，得到一个11维向量，每个维度的值代表每个维度上起始点x与终点y的步长距离，（??????????），我们得到11维向量\:$[4, 1, 6, 2, 3, 2, 59, 4, 3, 3, 6]$,
+在建模过程中发现，在11维空间中运行A*算法需要非常巨大的计算资源，于是进一步优化计算模型，得到的计算公式如下：
+\begin{align}
+\vec{d }&=\left | \left ( \vec{y}-\vec{x} \right ) \right |\\
+\overrightarrow{step }&= \frac{\vec{d }}{\overrightarrow{\Delta} }
+\end{align}
+用起始点x与终点y坐标的距离向量，元素除以对应的Δ，然后向上取整，得到一个11维向量，每个维度的值代表每个维度上起始点x与终点y的步长距离，我们得到11维向量\:$[4, 1, 6, 2, 3, 2, 59, 4, 3, 3, 6]$,
 我们发现只有少数维度步长距离较远，大部分维度距离并不远，于是我们决定将A*算法修改为两轮计算，每一轮都只在部分维度组成的子空间中找通往目的地的通路（其他维度保持不变），只要每一轮都可以找到这样符合上文所述约束条件的通路，那么两个通路链接起来，就是完整的从起点到终点的一条道路。
-我们从中选取步长距离较远的$index=[0,2,6,7,10]$维度进行第一轮优化，其他维度保持不变，当我们挑选的这些维度都优化到y点对应维度的值时，第一轮优化结束，此时的坐标为
+从中选取步长距离较远的$index=[0,2,6,7,10]$维度进行第一轮优化，其他维度保持不变，当挑选的这些维度都优化到y点对应维度的值时，第一轮优化结束，此时的坐标为
 x1=[121.3461, 34.4524, 4.9924, 0.0386, 120.7679, 52.7805, 321.5952, 32.7367, 8.8462,410.3512,-2.2292]对应的RON\_LOSS,  S为1.0422, 4.3748。接着，保持$index=[0,2,6,7,10]$对应的坐标值不变，对剩余的6个维度进行第二轮优化，优化结束后最终坐标等于[121.3461,34.2690,4.9924,0.1060,123.3863,59.77
 42,321.5952,32.7367,11.2289,412.8519,-2.2292]，即为第四问中求出的优化后操作变量值。
 将每一轮迭代中的硫产量,辛烷值损失，及相关操作变量画成曲线如图所示：
@@ -795,9 +815,9 @@ x1=[121.3461, 34.4524, 4.9924, 0.0386, 120.7679, 52.7805, 321.5952, 32.7367, 8.8
 
 \begin{thebibliography}{99}  
 \bibitem{ref1}Zheng L, Wang S, Tian L, et al., Query-adaptive late fusion for image search and person re-identification, Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, 2015: 1741-1750.  
-\bibitem{ref2}Arandjelović R, Zisserman A, Three things everyone should know to improve object retrieval, Computer Vision and Pattern Recognition (CVPR), 2012 IEEE Conference on, IEEE, 2012: 2911-2918.  
-\bibitem{ref3}Lowe D G. Distinctive image features from scale-invariant keypoints, International journal of computer vision, 2004, 60(2): 91-110.  
-\bibitem{ref4}Philbin J, Chum O, Isard M, et al. Lost in quantization: Improving particular object retrieval in large scale image databases, Computer Vision and Pattern Recognition, 2008. CVPR 2008, IEEE Conference on, IEEE, 2008: 1-8.  
+% \bibitem{ref2}Arandjelović R, Zisserman A, Three things everyone should know to improve object retrieval, Computer Vision and Pattern Recognition (CVPR), 2012 IEEE Conference on, IEEE, 2012: 2911-2918.  
+% \bibitem{ref3}Lowe D G. Distinctive image features from scale-invariant keypoints, International journal of computer vision, 2004, 60(2): 91-110.  
+% \bibitem{ref4}Philbin J, Chum O, Isard M, et al. Lost in quantization: Improving particular object retrieval in large scale image databases, Computer Vision and Pattern Recognition, 2008. CVPR 2008, IEEE Conference on, IEEE, 2008: 1-8.  
 \end{thebibliography}
 
 
@@ -808,31 +828,31 @@ x1=[121.3461, 34.4524, 4.9924, 0.0386, 120.7679, 52.7805, 321.5952, 32.7367, 8.8
 % \bibliography{example}
 
 
-%参考文献 2019年大学生数学建模比赛的模板中提取的
-\begin{thebibliography}{9}%宽度9
-    \bibitem{1}{liuhaiyang2013latex}
-    刘海洋.
-    \newblock \LaTeX {}入门\allowbreak[J].
-    \newblock 电子工业出版社, 北京, 2013.
-    \bibitem{2}{mathematical-modeling}
-    全国大学生数学建模竞赛论文格式规范 (2020 年 8 月 25 日修改).
-    \bibitem{3} \url{https://www.latexstudio.net}
-\end{thebibliography}
+% %参考文献 2019年大学生数学建模比赛的模板中提取的
+% \begin{thebibliography}{9}%宽度9
+%     \bibitem{1}{liuhaiyang2013latex}
+%     刘海洋.
+%     \newblock \LaTeX {}入门\allowbreak[J].
+%     \newblock 电子工业出版社, 北京, 2013.
+%     \bibitem{2}{mathematical-modeling}
+%     全国大学生数学建模竞赛论文格式规范 (2020 年 8 月 25 日修改).
+%     \bibitem{3} \url{https://www.latexstudio.net}
+% \end{thebibliography}
 
 
 
-？？？？？？？？？记得删掉
-@article{scikit-learn,
- title={Scikit-learn: Machine Learning in {P}ython},
- author={Pedregosa, F. and Varoquaux, G. and Gramfort, A. and Michel, V.
-         and Thirion, B. and Grisel, O. and Blondel, M. and Prettenhofer, P.
-         and Weiss, R. and Dubourg, V. and Vanderplas, J. and Passos, A. and
-         Cournapeau, D. and Brucher, M. and Perrot, M. and Duchesnay, E.},
- journal={Journal of Machine Learning Research},
- volume={12},
- pages={2825--2830},
- year={2011}
-}
+% ？？？？？？？？？记得删掉
+% @article{scikit-learn,
+%  title={Scikit-learn: Machine Learning in {P}ython},
+%  author={Pedregosa, F. and Varoquaux, G. and Gramfort, A. and Michel, V.
+%          and Thirion, B. and Grisel, O. and Blondel, M. and Prettenhofer, P.
+%          and Weiss, R. and Dubourg, V. and Vanderplas, J. and Passos, A. and
+%          Cournapeau, D. and Brucher, M. and Perrot, M. and Duchesnay, E.},
+%  journal={Journal of Machine Learning Research},
+%  volume={12},
+%  pages={2825--2830},
+%  year={2011}
+% }
 
 
 
