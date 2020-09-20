@@ -587,6 +587,59 @@ QuantileTransformer 可以把每个特征转换到0-1均匀分布或者$\mathbb{
 \FloatBarrier
 \subsubsection{贝叶斯优化与TPE算法简介}
 
+假设我们有一个函数$f:x\rightarrow \mathbb{R}$ 我们需要在$x\in X$内找到
+
+\begin{equation}\label{eq:optimation}
+	x^*={\arg\min}_{x\in X}f(x)
+\end{equation}
+
+当$f$是凸函数且定义域X也是凸的时候，我们可以用已经广泛研究的凸优化来处理，但$f$不一定是凸的。在这种情况下我们可以用启发式算法来做全局优化，常见的算法有进化算法、粒子群算法等。但贝叶斯算法具有鲁棒性高、搜索效率高等特点与优点，更适合本题的场景，故我们选择贝叶斯优化来对RON损失和硫含量进行优化。
+
+Sequential model-based optimization (SMBO) 是贝叶斯优化的最简形式，其算法思路如图\ref{img:smbo}所示。
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=.6\textwidth]{smbo}
+	\caption{SMBO算法}
+	\label{img:smbo}
+\end{figure}
+
+\begin{itemize}
+	\item $f$:评价函数，在本题中是章节\ref{sec:modeling}得到的预测模型
+	\item $X$:搜索空间，在本题中是与RON损失或硫相关的主要操作变量。
+	\item $D$:表示数据组成的数据集，在本题中是原工业数据。
+	\item $S$:是\textbf{Acquisition Function}（采集函数），用来评价采样样本的好坏，一般采用EI函数，见公式\eqref{eq:EI}。
+	\item $\mathit{M}$:是对数据集D进行拟合得到的模型，如随机森林、高斯过程等。本题使用TPE模型。
+\end{itemize}
+
+\begin{equation}\label{eq:EI}
+	EI(X)=\mathbb{E}_max(f(x)-f(x^+), 0)
+\end{equation}
+
+TPE全称Tree-structured Parzen Estimator，是用GMM（Gaussian Mixture Model）来学习超参模型的一种方法。
+
+首先根据 Bayes 定义，$p(x|y)$ 即模型 $loss$ 为 $y$ 的时候超参为 $x$ 的条件概率。第一步，我们根据已有的数据选取一个 $loss$ 的阈值 $y^*$，一般为15\%的分位数。对大于阈值和小于阈值的数据，分别学习两个概率密度 $l(x)$ 和 $g(x)$ 。
+
+\begin{equation}\label{eq:lxgx}
+	p(x|y)=\left\{
+	\begin{aligned}
+		l(x) & = & if \ y<y^* \\
+		g(x) & = & if \ y\ge y^* \\
+	\end{aligned}
+	\right.
+\end{equation}
+
+根据EI公式\eqref{eq:EI}，将其带入公式\eqref{eq:lxgx}，发现只要能${\arg\min}_x{g(x)/l(x)}$就能${\arg\min}_x{EI(x)}$。
+
+\begin{equation}\label{EIlxgx}
+	EI_{y^*}(x) \to (\gamma+\frac{g(x)}{l(x)}(1 - \gamma))^{-1}
+\end{equation}
+
+综上，TPE的原理就是建立两个分布：优势样本的分布于劣势样本的分布。TPE在每次迭代中按照这样的规则去采样：采样的样本在优势样本分布$l(x)$中的概率密度尽量大，在劣势样本分布$g(x)$中的概率密度尽量小，本质上是主键增大在优势样本附近采样率的一个启发式优化过程。
+
+
+
+
 \FloatBarrier
 \subsubsection{对产品硫含量进行优化}
 
