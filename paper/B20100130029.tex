@@ -560,8 +560,29 @@ QuantileTransformer 可以把每个特征转换到0-1均匀分布或者$\mathbb{
 \subsubsection{问题分析}
 
 
-？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？
-要求在保证产品硫含量不大于5μg/g的前提下，利用你们的模型获得325个数据样本(见附件四“325个数据样本数据.xlsx”)中，辛烷值（RON）损失降幅大于30%的样本对应的主要变量优化后的操作条件（优化过程中原料、待生吸附剂、再生吸附剂的性质保持不变，以它们在样本中的数据为准）。
+
+问题四的目标是在保证产品硫含量不大于5$\mu$/g的前提下，将章节\ref{sec:modeling}得到的RON损失模型作为评价函数，对章节\ref{sec:feature-selection}得到的12个主要变量（其中11个变量是操作条件，原料的RON值是常数）进行优化，尽量使RON损失降幅超过30\%。
+
+%\begin{fig\textit{ure}[htb]
+%	\centering
+%	\includegraphics[width=1\textwidth]{S-cross-validation}
+%	\caption{对S损失进行交叉验证}
+%	\label{RON-loss-cv}
+%\end{figure}}
+
+考虑到有硫含量的约束，所以先对操作变量与硫含量的关系进行建模。建模使用的回归器与机器学习管线与章节\ref{sec:modeling}中的相一致，其中特征筛选得到了9个关键变量：'精制汽油出装置硫含量'，'混氢点氢气流量'，'还原器温度'，'D203出口燃料气流量'，'D-123压力'，'烟气出对流室温度'，'冷氮气过滤器ME-114差压'，'R-102底喷头压差'。其中产品硫含量为常数，其余8个为可调整的操作变量。
+
+分析\textbf{与RON损失相关的11个操作变量}和\textbf{与S损失相关的8个操作变量}，两者交集为\textbf{“精炼汽油出装置硫含量”}。分析原工业数据的产品硫含量，其中有59个样本的硫含量超过了5$\mu$/g 。故应该先对硫含量进行优化，将325个样本的产品硫含量都优化到5$\mu$/g一下；然后对产品的RON损失值进行优化。因为操作变量“精炼汽油出装置硫含量”与RON损失相关，所以在对RON损失优化的过程中需要增加对产品硫含量的约束，使其满足题设条件；最后，如果有样本优化后仍不满足硫含量的约束，视其为异常样本，将其删除。算法流程图见图\ref{img:opt-flowchat}所示。
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=1\textwidth]{opt-flowchat}
+	\caption{对RON损失进行交叉验证}
+	\label{img:opt-flowchat}
+\end{figure}
+
+
+
 
 \FloatBarrier
 \subsubsection{贝叶斯优化与TPE算法简介}
