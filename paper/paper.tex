@@ -354,6 +354,11 @@ do \ not \ process, \ & if \ mean(vector)<=5
 
 在本题中，虽然我们有大量的特征可使用，有的特征携带的信息丰富，有的特征携带的信息有重叠，有的特征则属于无关特征，如果所有特征不经筛选地全部作为训练特征，经常会出现维度灾难问题，甚至会降低模型的准确性。因此，我们需要进行特征筛选，排除无效/冗余的特征，把有用的特征挑选出来作为模型的训练数据。
 
+
+
+\FloatBarrier
+\subsubsection{通过特征筛选获取主要变量}
+
 特征筛选的方法又分为3类，分别是Filter方法（过滤式），Wrapper方法（封装式）和Embedded方法（嵌入式）：
 
 \begin{enumerate}
@@ -381,27 +386,29 @@ GBDT模型能够在建模过程中计算各个特征的特征重要度。在GBDT
 
 考虑到GBDT模型的准确性与鲁棒性，我们选用GBDT模型作为嵌入式特征筛选法的基模型。GBDT采用的是\texttt{sklearn.ensemble.GradientBoostingRegressor}，嵌入式特征筛选采用的是\texttt{sklearn.feature\_selection.SelectFromModel}。
 
-\FloatBarrier
-\subsubsection{通过特征筛选获取主要变量}
-
 \begin{figure}[htb]
 	\centering
 	\begin{minipage}[c]{0.4\textwidth}
 		\centering
-		\includegraphics[width=0.32\textheight]{feature-selection-perfs}
+		\includegraphics[width=0.32\textheight]{feature-selection-feats}
 		\subcaption{特征筛选n次后剩余特征数}
 	\end{minipage}
 	\begin{minipage}[c]{0.4\textheight}
 		\centering
-		\includegraphics[width=0.32\textheight]{feature-selection-feats}
+		\includegraphics[width=0.32\textheight]{feature-selection-perfs}
 		\subcaption{特征筛选次数与$r^2$评价指标的关系}
 	\end{minipage}
-	\caption{3种处理空值的策略}
+	\caption{特征筛选n次后的剩余特征数与$r^2$评价指标}
 \end{figure}
 
+考虑到一次特征筛选可能并不能得到最好的筛选效果（无关变量还混杂在剩余的变量中），我们通过实验探索了特征筛选次数与剩余特征数、下游模型$r^2$的关系。下游模型与章节\ref{sec:modeling}一致，为LightGBM模型。我们将特征筛选器与回归器组合成一个pipeline： \texttt{Pipeline(SelectFromModel, LGBMRegressor)}，作为一个整体来验证特征筛选的效果。
+
+该实验分别进行了0次特征筛选到5次特征筛选（0次特征筛选表示不进行特征筛选），得到的实验结果如图4和表\ref{tab:002}所示。
+
+实验反映了剩余特征数的下降程度随着特征筛选次数的增加逐渐减小，而模型整体表现在特征筛选数为3时到达峰值，之后迅速下降，说明3次特征筛选后保留的均为重要特征，如果再删除就会极大地影响模型表现。
 
 \begin{table}[!htbp]
-	\caption{特征筛选n次后的各指标}\label{tab:001} \centering
+	\caption{特征筛选n次后的各指标}\label{tab:002} \centering
 	\begin{tabular}{ccc}
 		\toprule[1.5pt]
 	feature selection times &  $r^2$ metrics &  n\_features left \\
@@ -416,53 +423,66 @@ GBDT模型能够在建模过程中计算各个特征的特征重要度。在GBDT
 	\end{tabular}
 \end{table}
 
-
-\FloatBarrier
-\subsubsection{主要变量数据分析}
+通过实验，确定了做3次特征筛选的方案。根据这一方案，筛选出了12个主要变量，变量的名称与特征重要度见图5与表\ref{tab:003}。
 
 \begin{table}[htb]
-	\caption{主要变量的特征重要度}\label{tab:001} \centering
+	\caption{主要变量的特征重要度}\label{tab:003} \centering
 	\begin{tabular}{ccccc}
 		\toprule[1.5pt]
-	 rank & feature importances & percentage (\%) &                  name &        CN name \\
+		rank & feature importances & percentage (\%) &                  name &        CN name \\
 		\midrule[1pt]
-    0 &              0.0785 &          12.83 &  S-ZORB.PDT\_1003.DACA &  P-101B入口过滤器差压 \\
-	1 &              0.0774 &          12.66 &    S-ZORB.PC\_1001A.PV &    D101原料缓冲罐压力 \\
-	2 &              0.0602 &           9.84 &     S-ZORB.TC\_5005.PV &        稳定塔下部温度 \\
-	3 &              0.0596 &           9.74 &   S-ZORB.LI\_9102.DACA &        D-204液位 \\
-	4 &              0.0515 &           8.42 &   S-ZORB.TE\_1107.DACA &  E-101D壳程出口管温度 \\
-	5 &              0.0474 &           7.75 &    S-ZORB.SIS\_TE\_2802 &        D-102温度 \\
-	6 &              0.0443 &           7.25 &     S-ZORB.TE\_5202.PV &      精制汽油出装置温度 \\
-	7 &              0.0408 &           6.67 &   S-ZORB.TE\_1605.DACA &  F-101出口支管\#4温度 \\
-	8 &              0.0390 &           6.37 &   S-ZORB.DT\_2001.DACA &    R-101下部床层压降 \\
-	9 &              0.0385 &           6.29 &     S-ZORB.PC\_1603.PV &   加热炉主火嘴瓦斯入口压力 \\
-	10 &              0.0379 &           6.20 &     S-ZORB.AT\_5201.PV &     精制汽油出装置硫含量 \\
-	11 &              0.0364 &           5.95 &                   RON &            辛烷值 \\
+		0 &              0.0785 &          12.83 &  S-ZORB.PDT\_1003.DACA &  P-101B入口过滤器差压 \\
+		1 &              0.0774 &          12.66 &    S-ZORB.PC\_1001A.PV &    D101原料缓冲罐压力 \\
+		2 &              0.0602 &           9.84 &     S-ZORB.TC\_5005.PV &        稳定塔下部温度 \\
+		3 &              0.0596 &           9.74 &   S-ZORB.LI\_9102.DACA &        D-204液位 \\
+		4 &              0.0515 &           8.42 &   S-ZORB.TE\_1107.DACA &  E-101D壳程出口管温度 \\
+		5 &              0.0474 &           7.75 &    S-ZORB.SIS\_TE\_2802 &        D-102温度 \\
+		6 &              0.0443 &           7.25 &     S-ZORB.TE\_5202.PV &      精制汽油出装置温度 \\
+		7 &              0.0408 &           6.67 &   S-ZORB.TE\_1605.DACA &  F-101出口支管\#4温度 \\
+		8 &              0.0390 &           6.37 &   S-ZORB.DT\_2001.DACA &    R-101下部床层压降 \\
+		9 &              0.0385 &           6.29 &     S-ZORB.PC\_1603.PV &   加热炉主火嘴瓦斯入口压力 \\
+		10 &              0.0379 &           6.20 &     S-ZORB.AT\_5201.PV &     精制汽油出装置硫含量 \\
+		11 &              0.0364 &           5.95 &                   RON &            辛烷值 \\
 		\bottomrule[1.5pt]
 	\end{tabular}
 \end{table}
 
-\begin{figure}[htb]
-	\centering
-	\includegraphics[width=.7\textwidth]{feat-imp}
-	\caption{主要变量的特征重要度}
-\end{figure}
+
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=.7\textwidth]{pairplot}
+	\includegraphics[width=.5\textwidth]{feat-imp}
+	\caption{主要变量的特征重要度}
+\end{figure}
+
+
+\FloatBarrier
+\subsubsection{主要变量数据分析}
+
+
+
+对于筛选得到的12个主要变量，我们依据特征重要度取前4个变量加上预测目标RON损失一起做一个相关性分析，得到了图6所示的相关性矩阵图。我们根据pearson相关系数公式\eqref{eq:pearson}计算了12个主要变量加上RON损失两两之间的相关系数，并绘制了图7所示的特征相关系数热力图。
+
+\begin{equation}\label{eq:pearson}
+	\rho_X,Y=\frac{X,Y}{\sigma_X\sigma_Y}
+\end{equation}
+
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=1\textwidth]{pairplot}
 	\caption{相关性矩阵图}
 \end{figure}
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=.7\textwidth]{heatmap}
-	\caption{热力图}
+	\includegraphics[width=1.2\textwidth]{heatmap}
+	\caption{特征相关系数热力图}
 \end{figure}
 
 
 \FloatBarrier
-\subsection{问题三：建立辛烷值（RON）损失预测模型}
+\subsection{问题三：建立辛烷值（RON）损失预测模型}\label{sec:modeling}
 
 \FloatBarrier
 \subsubsection{问题分析}
@@ -562,7 +582,7 @@ GBDT模型能够在建模过程中计算各个特征的特征重要度。在GBDT
 \end{figure}
 
 \begin{table}[htb]
-	\caption{3个优化后不符合约束条件的异常样本}\label{tab:001} \centering
+	\caption{3个优化后不符合约束条件的异常样本}\label{tab:004} \centering
 	\begin{tabular}{ccccc}
 		\toprule[1.5pt]
 	 time &  原硫含量($\mu g/g$) &  优化后硫含($\mu g/g$) &  原RON损失 &  优化后RON损失 \\
