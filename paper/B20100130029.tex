@@ -991,13 +991,256 @@ x1=[121.3461, 34.4524, 4.9924, 0.0386, 120.7679, 52.7805, 321.5952, 32.7367, 8.8
 %附录
 \appendix
 %\setcounter{page}{1} %如果需要可以自行重置页码。
-\section{我的 Python 源程序}
+\section{数据预处理关键部分 Python源程序}
 \begin{lstlisting}[language=Python]%设置不同语言即可。
+import pandas as pd
+import numpy as np
+import parse
+
+import pylab as plt
+
+df = pd.read_excel("附件一：325个样本数据.xlsx", skiprows=[0, 1])
+columns = ops.columns[eq_0>=H]
+print(f"many 0 n_columns = {len(columns)}")
+for column in columns:
+	plt.subplot(1,2,1)
+	(ops[column].hist())
+	plt.subplot(1,2,2)
+	plt.plot(ops[column].index, ops[column].tolist())
+	plt.show()
+	print("column =", column)
+	print("n_zeros = ",np.count_nonzero(ops[column]==0))
+	print("mean = ",np.mean(ops[column]))
+	print("var = ",np.var(ops[column]))
+	print("="*20)
+	def plot_empty(cols, fname):
+	N = len(cols)
+	plt.rcParams['figure.figsize'] =(6 * N, 12)
+	
+for i, col in enumerate(cols):
+# 获取名字
+name = op_df.loc[col, "位号"]
+print(name)
+title = f'{name}'
+cn = op_df.loc[col, "中文名称"]
+print(cn)
+if not pd.isna(cn):
+	title += f"({cn})"
+	# 直方图（分布）
+	plt.subplot(N, 2, i * 2 + 1)
+	plt.grid(alpha=0.5)
+	plt.hist(ops[col])
+	plt.xlabel("value")
+	plt.ylabel("frequency")
+	plt.title(f"{cn}-分布图")
+	# 折线图
+	plt.subplot(N, 2, i * 2 + 2)
+	plt.title(f"{cn}-折线图")
+	#     x_major_locator=MultipleLocator(50)
+	#     ax.xaxis.set_major_locator(x_major_locator)
+	plt.grid(alpha=0.5)
+	plt.xlabel("time")
+	plt.ylabel("value")
+
+s=ops[col]; 
+plt.plot(df.index, s.tolist()) 
+plt.tight_layout()
+plt.savefig(f"{fname}.pdf")
+plt.close()
+for i in range(354):
+	logic = ~np.logical_and(d285.iloc[:,i+1]>=op_df.loc[i,"lower"] , d285.iloc[:,i+1]<=op_df.loc[i,"upper"])
+	n_invalids = (logic.sum())
+	if n_invalids>0:
+	print(i, n_invalids)
+	x_major_locator=MultipleLocator(5)
+	ax=plt.gca()
+	#ax为两条坐标轴的实例
+	ax.xaxis.set_major_locator(x_major_locator)
+	plt.xticks(rotation=30)
+	plt.rcParams['figure.figsize'] =(7, 6)
+	plt.grid()
+	plt.title(op_df.loc[108, "位号"])
+	s=d313_["Unnamed: 109"]; plt.plot(d313.time, s.tolist()) # 2 zeros [24, 25]
+	plt.tight_layout()
+	plt.savefig("313_fill_1.pdf")
+\end{lstlisting}
 
 
+\section{LightGBM建模与特征筛选 Python源程序}
+\begin{lstlisting}[language=Python]%设置不同语言即可。
+import pandas as pd
+import numpy as np
+from sklearn.pipeline import Pipeline
+from sklearn.feature_selection import SelectFromModel
+from lightgbm import LGBMRegressor
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.model_selection import KFold, cross_val_score
+import pylab as plt
+from scipy.stats import pearsonr
+from sklearn.metrics import r2_score
+from sklearn.preprocessing import QuantileTransformer
+from joblib import dump
+import warnings
+import seaborn as sns
 
- \end{lstlisting}
+warnings.filterwarnings("ignore")
+X = pd.read_csv("../processed.csv")
+y_s = X.pop("S")
+RON = X.pop("RON")
+y = X.pop("RON_loss")
 
 
+def func(X: pd.DataFrame, y: pd.Series, selection_times=3, title="RON_loss", del_abnormal=False,
+	abnormal_threshold=0.08):
+	y = np.array(y)
+	selector = SelectFromModel(
+	estimator=GradientBoostingRegressor(random_state=0))
+	X_ = QuantileTransformer(n_quantiles=1000).fit_transform(X)
+	X_ = pd.DataFrame(X_, columns=X.columns)
+	for i in range(selection_times):
+	X_d = selector.fit_transform(X_, y)
+	X_ = pd.DataFrame(X_d, columns=X_.columns[selector.get_support()])
+	X_d = QuantileTransformer(n_quantiles=1000).fit_transform(X[X_.columns])
+	# X_d=X[X_.columns].values
+	X_ = pd.DataFrame(X_d, columns=X_.columns)
+	print(f"{title} | {selection_times}次特征筛选后的X_.shape = {X_.shape}")
+	print(f"{title} | 特征筛选后保留的列： {X_.columns.tolist()}")
+	cv = KFold(n_splits=5, shuffle=True, random_state=0)
+	pipeline = LGBMRegressor(random_state=0, n_estimators=100, learning_rate=0.1)
+	pipeline.fit(X_, y)
+	y_pred = pipeline.predict(X_)
+	train_score = r2_score(y, y_pred)
+	pearson_correlation = pearsonr(y, y_pred)[0]
+	print(f"{title} | 在训练集上，r2 = {train_score}, pearson 相关系数 = {pearson_correlation}")
+	y_ = y.copy()
+	y_pred_ = y_pred.copy()
+	if del_abnormal:
+	y_pred = pipeline.predict(X_)
+	err = np.abs(y - y_pred)
+	mask = err > abnormal_threshold
+	print(f"{title} | 异常样本数 = {np.count_nonzero(mask)}")
+	plt.rcParams['figure.figsize'] = (7, 4.5)
+	plt.grid(alpha=0.2)
+	plt.scatter(y[mask], y_pred[mask], label="abnormal samples", c="r")
+	plt.scatter(y[~mask], y_pred[~mask], label="normal samples", c="b")
+	plt.legend(loc="best")
+	print(f"{title} | 删除异常样本前的表现 = {cross_val_score(pipeline, X_, y, cv=cv).mean()}")
+	X_ = X_.loc[~mask, :]
+	y = y[~mask]
+	print(f"{title} | 删除异常样本后的表现 = {cross_val_score(pipeline, X_, y, cv=cv).mean()}")
+	plt.title(f"{title} abnormal samples")
+	plt.xlabel("y true")
+	plt.ylabel("y pred")
+	plt.savefig(f"{title}_abnormal.pdf")
+	plt.close()
+	valid_scores = []
+	plt.rcParams['figure.figsize'] = (18, 12)
+	for i, (train_ix, valid_ix) in enumerate(cv.split(X_, y)):
+		X_train = X_.iloc[train_ix, :].copy()
+		X_valid = X_.iloc[valid_ix, :].copy()
+		y_train = y[train_ix].copy()
+		y_valid = y[valid_ix].copy()
+		pipeline.fit(X_train, y_train)
+		y_pred = pipeline.predict(X_valid)
+		plt.subplot(2, 3, i + 1)
+		sns.regplot(x="y true", y="y pred",
+		data=pd.DataFrame({"y true": y_valid, "y pred": y_pred}))
+		plt.title(f"fold-{i + 1}")
+		valid_scores.append(r2_score(y_valid, y_pred))
+		plt.subplot(2, 3, 6)
+		sns.regplot(x="y true", y="y pred",
+		data=pd.DataFrame({"y true": y_, "y pred": y_pred_}))
+		plt.title(f"train-set")
+		plt.suptitle(f"{title} cross-validation")
+		print(f"{title} | 5折交叉验证后，在验证集上的平均r2 = {np.mean(valid_scores)}\n"
+		f"{title} | 每折的r2 = {valid_scores}")
+		plt.savefig(f"{title}_cross-validation.pdf")
+		plt.close()
+		X_["label"] = y
+		X_.to_csv(f"{title}_data.csv", index=False)
+		dump(pipeline, f"{title}_model.bz2")
+
+func(X, y, selection_times=3, title="RON_loss", del_abnormal=True, abnormal_threshold=0.08)
+func(X, y_s, selection_times=2, title="S", del_abnormal=False)
+\end{lstlisting}
+
+\section{硫与RON损失优化 Python源程序}
+\begin{lstlisting}[language=Python]%设置不同语言即可。
+def optimize_RON_loss(R, S_pipeline, RON_pipeline, max_evals=50):
+	space = []
+	label = RON_loss
+	X_cur = X_RON.drop("label", axis=1)
+	for column in X_cur.columns:
+	if column == "label":
+		continue
+		if not column.startswith("op"):
+			space.append(X.loc[R, column])
+		else:
+			space.append(hp.uniform(column, op_df.loc[column, "lower"], op_df.loc[column, "upper"]))
+		#         init_point.append(X.loc[R, column])
+	
+	def objective(arg):
+		op21 = arg[3]
+		s = X.loc[R, X_S.drop("label", axis=1).columns]
+		#         print(s)
+		s["op21"]=op21
+		#         print(s)
+		arr = []
+		arr = np.array(arg).reshape(1, -1)
+		RON_pred = RON_pipeline.predict(arr).flatten()[0]
+		S_pred = S_pipeline.predict(s.values.reshape(1, -1)).flatten()[0]
+		if S_pred >= 5:
+			return 100000
+		return RON_pred
+	
+	print(f"before optimization, loss = {label[R]}")
+	best = fmin(objective, space, algo=tpe.suggest, max_evals=max_evals)  # points_to_evaluate=[init_point]
+	point = space_eval(space, best)
+	loss_opted = objective(space_eval(space, best))
+	
+	#     before_losses.append(RON_loss[R])
+	if loss_opted<label[R]:
+		after_losses.append(loss_opted)
+	else:
+		after_losses.append(label[R])
+	print(f"after optimization, loss = {after_losses[-1]}")
+	X.loc[R, X_cur.columns] = point
+	print("=" * 50)
+
+def optimize_S(R):
+	space = []
+	X_cur = X_S.drop("label", axis=1)
+	transformer = QuantileTransformer(n_quantiles=1000).fit(X[X_cur.columns])
+	for column in X_cur.columns:
+	if column == "label":
+		continue
+	if not column.startswith("op"):
+		space.append(X.loc[R, column])
+	else:
+		space.append(hp.uniform(column, op_df.loc[column, "lower"], op_df.loc[column, "upper"]))
+	pipeline = Pipeline([
+	("transformer", transformer),
+	("lgbm", S_model),
+	])
+	def objective(arg):
+	arr = []
+	arr = np.array(arg).reshape(1, -1)
+	return pipeline.predict(arr).flatten()[0]
+	
+	print(f"before optimization, loss = {S[R]}")
+	best = fmin(objective, space, algo=tpe.suggest, max_evals=50)
+	point = space_eval(space, best)
+	loss_opted = objective(space_eval(space, best))
+	print(f"after optimization, loss = {loss_opted}")
+	if loss_opted >= 5:
+		print(f"[WARNING] sample {R} is bad!!!")
+	bad_samples.append(R)
+	else:
+		X.loc[R, X_cur.columns] = point
+	if loss_opted<S[R]:
+		S_after_losses.append(loss_opted)
+	else:
+		S_after_losses.append(S[R])
+\end{lstlisting}
 
 \end{document} 
