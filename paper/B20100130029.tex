@@ -291,7 +291,7 @@
 \FloatBarrier
 \subsubsection{用3$\sigma$准则删除异常样本}
 
-3$\sigma$准则：设对被测量变量进行等精度测量，得到$x_1, x_2, \ldots, x_n$，算出其算术平均值$x$及剩余误差$v_i=x_i-x (i=1, 2, \ldots , n)$，并按贝塞尔公式算出标准误差$\sigma$，若某个测量值$x_b$的剩余误差$v_b ( 1 <= b <= n )$，满足 $|v_b| = | x_b - x | > 3\sigma$，则认为$x_b$是含有粗大误差值的坏值，应予剔除。贝塞尔公式如下：
+3$\sigma$准则\cite{3sigma}：设对被测量变量进行等精度测量，得到$x_1, x_2, \ldots, x_n$，算出其算术平均值$x$及剩余误差$v_i=x_i-x (i=1, 2, \ldots , n)$，并按贝塞尔公式算出标准误差$\sigma$，若某个测量值$x_b$的剩余误差$v_b ( 1 <= b <= n )$，满足 $|v_b| = | x_b - x | > 3\sigma$，则认为$x_b$是含有粗大误差值的坏值，应予剔除。贝塞尔公式如下：
 
 \begin{equation}\label{eq:3sigma}
 	\sigma = [\frac{1}{n-1}\sum_{i=1}^{n}v_i^2]^{\frac{1}{2}} = \{\frac{[\sum^n_{i=1}x_i^2 - (\sum^n_{i=1}x_i)^2/n]}{n-1}\}^{\frac{1}{2}}
@@ -365,10 +365,10 @@ do \ not \ process, \ & if \ mean(vector)<=5
 
 建立降低辛烷值损失模型涉及包括7个原料性质、2个待生吸附剂性质、2个再生吸附剂性质、2个产品性质等变量以及另外354个操作变量（共计367个变量），工程技术应用中经常使用先降维后建模的方法，这有利于忽略次要因素，发现并分析影响模型的主要变量与因素。
 
-寻找主要变量的方法有两类，一类方法是主成分分析（Principal Component Analysis, PCA），其所要做的就是设法将原来众多
+寻找主要变量的方法有两类，一类方法是主成分分析（Principal Component Analysis, PCA）\cite{Smith2002}，其所要做的就是设法将原来众多
 具有一定相关性的变量，重新组合为一组新的相互无关的综合变量来代替原来的
 变量。通常，数学上的处理方法就是将原来的变量做线性组合，作为新的综合变
-量。另一类方式是特征筛选，通过剔除无关变量与混淆变量，保留主要变量与关键变量，从而提升后续机器学习建模过程的表现。
+量。另一类方式是特征筛选\cite{featur-selection}，通过剔除无关变量与混淆变量，保留主要变量与关键变量，从而提升后续机器学习建模过程的表现。
 
 在本题中，虽然PCA方法也能起到降维的作用，但考虑到问题3与问题4需要对主要变量进行优化，而不是PCA计算得到的主成分变量，所以决定在此使用特征筛选方法寻找建模主要变量。
 
@@ -383,7 +383,7 @@ do \ not \ process, \ & if \ mean(vector)<=5
 
 \begin{enumerate}
 	\item 过滤式：主要思想是对每一维特征“打分”，即给每一维的特征赋予权重，这样的权重就代表着该特征的重要性，然后依据权重排序。主要方法有卡方检验（Chi--squared Test），信息增益（Information Gain），相关系数（Correlation Coefficient Scores）等方法。
-	\item 封装式：主要思想是将子集的选择看作是一个搜索寻优问题，生成不同的组合，对组合进行评价，再与其他的组合进行比较。这样就将子集的选择看作是一个优化问题，这里有很多的优化算法可以解决，尤其是一些启发式的优化算法，如GA、PSO等。最为经典的代表是\texttt{scikit-learn}实现的递归特征消除法（Recursion Feature Elimination, RFE）
+	\item 封装式：主要思想是将子集的选择看作是一个搜索寻优问题，生成不同的组合，对组合进行评价，再与其他的组合进行比较。这样就将子集的选择看作是一个优化问题，这里有很多的优化算法可以解决，尤其是一些启发式的优化算法，如GA\cite{GA-FS}、PSO\cite{PSO-FS}等。最为经典的代表是\texttt{scikit-learn}实现的递归特征消除法（Recursion Feature Elimination, RFE）
 	\item 嵌入式：主要思想是在模型既定的情况下学习出对提高模型准确性帮助最大的特征，也就是在确定模型的过程中，挑选出那些对模型的训练有重要意义的特征。主要方法有用带有L1正则化的项完成特征选择（也可以结合L2惩罚项来优化）、随机森林平均不纯度减少法/平均精确度减少法。
 \end{enumerate}
 
@@ -618,7 +618,7 @@ QuantileTransformer 可以把每个特征转换到0-1均匀分布或者$\mathbb{
 
 当$f$是凸函数且定义域X也是凸的时候，可以用已经广泛研究的凸优化来处理，但$f$不一定是凸的。在这种情况下就可以用启发式算法来做全局优化，常见的算法有进化算法、粒子群算法等。但贝叶斯算法具有鲁棒性高、搜索效率高等特点与优点，更适合本题的场景，故在此选择贝叶斯优化来对RON损失和硫含量进行优化。
 
-Sequential model-based optimization (SMBO) 是贝叶斯优化的最简形式，其算法思路如图\ref{img:smbo}所示。
+Sequential model-based optimization (SMBO)\cite{SMAC} 是贝叶斯优化的最简形式，其算法思路如图\ref{img:smbo}所示。
 
 \begin{figure}[htb]
 	\centering
@@ -632,7 +632,7 @@ Sequential model-based optimization (SMBO) 是贝叶斯优化的最简形式，�
 	\item $X$:搜索空间，在本题中是与RON损失或硫相关的主要操作变量。
 	\item $D$:表示数据组成的数据集，在本题中是原工业数据。
 	\item $S$:是\textbf{Acquisition Function}（采集函数），用来评价采样样本的好坏，一般采用EI函数，见公式\eqref{eq:EI}。
-	\item $\mathit{M}$:是对数据集D进行拟合得到的模型，如随机森林、高斯过程等。本题使用TPE模型。
+	\item $\mathit{M}$:是对数据集D进行拟合得到的模型，如随机森林、高斯过程等。本题使用TPE\cite{TPE}模型。
 \end{itemize}
 
 \begin{equation}\label{eq:EI}
@@ -779,7 +779,7 @@ TPE全称Tree-structured Parzen Estimator，是用GMM（Gaussian Mixture Model�
 
 \FloatBarrier
 \subsubsection{问题建模}
-考虑到工程实际情况，在此使用改进的启发式搜素A*算法求解该问题。本问题的处理流程图及A*算法的流程图如下：
+考虑到工程实际情况，在此使用改进的启发式搜素A*\cite{Astart}算法求解该问题。本问题的处理流程图及A*算法的流程图如下：
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=1.0\textwidth]{5lct}
@@ -913,41 +913,13 @@ x1=[121.3461, 34.4524, 4.9924, 0.0386, 120.7679, 52.7805, 321.5952, 32.7367, 8.8
 
 
 
-\newpage
-
-
-
-% \section{加图的方法，记得删除}
-% \begin{figure}[htb]
-% \centering
-% \includegraphics[width=.7\textwidth]{f1.png}
-% \caption{问题三流程图}
-% \end{figure}
-
-
-%下面两种参考文献的格式二选一
-
-%参考文献重新分页
-
-
-% 参考文献   手工录入
-% \begin{thebibliography}{9}%宽度9
-% \bibitem{bib:one} ....
-% \bibitem{bib:two} ....
-% \end{thebibliography}
+%\newpage
+%\cite{mittelbach_latex_2004,wright_latex3_2009,beeton_unicode_2008,vieth_experiences_2009}
 
 \newpage
-\begin{thebibliography}{99}  
-\bibitem{ref1}Pedregosa, F. and Varoquaux, G. and Gramfort, A. and Michel, V.
-         and Thirion, B. and Grisel, O. and Blondel, M. and Prettenhofer, P.
-         and Weiss, R. and Dubourg, V. and Vanderplas, J. and Passos, A. and
-         Cournapeau, D. and Brucher, M. and Perrot, M. and Duchesnay, E., Scikit-learn: Machine Learning in {P}ython, America: Journal of Machine Learning Research, 2825--2830，2011。
- \bibitem{ref2}周志华，机器学习，北京： 清华大学出版社，23--51，2016。  
- \bibitem{ref2}李航，统计学习，北京： 清华大学出版社，47--53，2012。 
- \bibitem{ref3}P. E. Hart, N. J. Nilsson, and B. Raphael. A formal basis for the heuristic determination of minimum cost paths in graphs，America:  IEEE Trans. Syst. Sci. and Cybernetics, SSC-4(2):100-107, 1968。 
- \bibitem{ref4}Hua Zhu，[算法]图解A* 搜索算法，https://blog.csdn.net/JasonZhu\_csdn/article/details/8626622，2020年9月21日。
+\bibliographystyle{gmcm}
+\bibliography{citation}
 
- \end{thebibliography}
 
 
 % \bibitem{ref1}Zheng L, Wang S, Tian L, et al., Query-adaptive late fusion for image search and person re-identification, Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, 2015: 1741-1750.  
