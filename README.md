@@ -12,6 +12,9 @@ paper/ 目录为论文
 xelatex.exe -synctex=1 -interaction=nonstopmode "example".tex
 ```
 
-不再同步 ``example.pdf`` ，因为那玩意可以在你电脑上编译出来，同步没有意义
+不再同步 ``example.pdf`` ，因为那玩意可以在你电脑上编译出来，同步没有意义，配置相应的.gitignore。
 
 code/  目录为代码
+
+---
+最终收获国家二等奖，感谢Chairman.Tang David DXQ三位同学的付出！
