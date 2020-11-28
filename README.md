@@ -17,4 +17,4 @@ xelatex.exe -synctex=1 -interaction=nonstopmode "example".tex
 code/  目录为代码
 
 ---
-最终收获国家二等奖，感谢Chairman.Tang David DXQ三位同学的付出！
+最终收获国家二等奖，感谢Chairman.Tang David DXQ三位同学的付出！:zap::cow:
